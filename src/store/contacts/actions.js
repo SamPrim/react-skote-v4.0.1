@@ -30,8 +30,9 @@ export const getUsersFail = error => ({
   payload: error,
 })
 
-export const getUserProfile = () => ({
+export const getUserProfile = id => ({
   type: GET_USER_PROFILE,
+  payload: id
 })
 
 export const getUserProfileSuccess = userProfile => ({

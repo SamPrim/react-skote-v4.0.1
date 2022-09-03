@@ -18,7 +18,7 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
 // actions
-import { apiError, loginUser, socialLogin } from "../../store/actions";
+import { apiError, loginUser } from "../../store/actions";
 
 // import images
 import profile from "../../assets/images/profile-img.png";
@@ -34,40 +34,6 @@ class Login extends Component {
   componentDidMount() {
     this.props.apiError("");
   }
-
-  signIn = (res, type) => {
-    const { socialLogin } = this.props;
-    if (type === "google" && res) {
-      const postData = {
-        name: res.profileObj.name,
-        email: res.profileObj.email,
-        token: res.tokenObj.access_token,
-        idToken: res.tokenId,
-      };
-      socialLogin(postData, this.props.history, type);
-    } else if (type === "facebook" && res) {
-      const postData = {
-        name: res.name,
-        email: res.email,
-        token: res.accessToken,
-        idToken: res.tokenId,
-      };
-      socialLogin(postData, this.props.history, type);
-    }
-  };
-
-  //handleGoogleLoginResponse
-  googleResponse = response => {
-    this.signIn(response, "google");
-  };
-
-  //handleTwitterLoginResponse
-  twitterResponse = () => {};
-
-  //handleFacebookLoginResponse
-  facebookResponse = response => {
-    this.signIn(response, "facebook");
-  };
 
   render() {
     return (
@@ -87,7 +53,7 @@ class Login extends Component {
                       <Col className="col-7">
                         <div className="text-primary p-4">
                           <h5 className="text-primary">Welcome Back !</h5>
-                          <p>Sign in to continue to Skote.</p>
+                          <p>Sign in to continue to Passcam</p>
                         </div>
                       </Col>
                       <Col className="col-5 align-self-end">
@@ -130,10 +96,9 @@ class Login extends Component {
                         enableReinitialize={true}
                         initialValues={{
                           email:
-                            (this.state && this.state.email) ||
-                            "admin@themesbrand.com",
+                            (this.state && this.state.email),
                           password:
-                            (this.state && this.state.password) || "123456",
+                            (this.state && this.state.password),
                         }}
                         validationSchema={Yup.object().shape({
                           email: Yup.string().required(
@@ -225,49 +190,6 @@ class Login extends Component {
                             </div>
 
                             <div className="mt-4 text-center">
-                              <h5 className="font-size-14 mb-3">
-                                Sign in with
-                              </h5>
-
-                              <ul className="list-inline">
-                                <li className="list-inline-item">
-                                  <FacebookLogin
-                                    appId={facebook.APP_ID}
-                                    autoLoad={false}
-                                    callback={this.facebookResponse}
-                                    render={renderProps => (
-                                      <Link
-                                        to={""}
-                                        className="social-list-item bg-primary text-white border-primary"
-                                      >
-                                        <i className="mdi mdi-facebook" />
-                                      </Link>
-                                    )}
-                                  />
-                                </li>
-                                <li className="list-inline-item">
-                                  {google.CLIENT_ID === "" ? (
-                                    ""
-                                  ) : (
-                                    <GoogleLogin
-                                      clientId={google.CLIENT_ID}
-                                      render={renderProps => (
-                                        <Link
-                                          to={""}
-                                          className="social-list-item bg-danger text-white border-danger"
-                                        >
-                                          <i className="mdi mdi-google" />
-                                        </Link>
-                                      )}
-                                      onSuccess={this.googleResponse}
-                                      onFailure={() => {}}
-                                    />
-                                  )}
-                                </li>
-                              </ul>
-                            </div>
-
-                            <div className="mt-4 text-center">
                               <Link
                                 to="/forgot-password"
                                 className="text-muted"
@@ -284,14 +206,8 @@ class Login extends Component {
                 </Card>
                 <div className="mt-5 text-center">
                   <p>
-                    Don&apos;t have an account ?
-                    <Link to="register" className="fw-medium text-primary">
-                      Signup Now
-                    </Link>
-                  </p>
-                  <p>
-                    © {new Date().getFullYear()} Skote. Crafted with
-                    <i className="mdi mdi-heart text-danger" /> by Themesbrand
+                    © {new Date().getFullYear()} Stock. Crafted with
+                    <i className="mdi mdi-heart text-danger" /> by Prime from Augentic Passcam
                   </p>
                 </div>
               </Col>
@@ -308,7 +224,6 @@ Login.propTypes = {
   error: PropTypes.any,
   history: PropTypes.object,
   loginUser: PropTypes.func,
-  socialLogin: PropTypes.func,
 };
 
 const mapStateToProps = state => {
@@ -317,5 +232,5 @@ const mapStateToProps = state => {
 };
 
 export default withRouter(
-  connect(mapStateToProps, { loginUser, apiError, socialLogin })(Login)
+  connect(mapStateToProps, { loginUser, apiError })(Login)
 );

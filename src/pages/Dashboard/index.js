@@ -5,7 +5,7 @@ import {
 
 class Dashboard extends Component {
   render() {
-    document.title = "Dashboard | Skote - React Admin & Dashboard Template";
+    document.title = "Dashboard | Admin";
     return (
       <React.Fragment>
         <div className="page-content">

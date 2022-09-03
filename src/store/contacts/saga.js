@@ -4,6 +4,7 @@ import { call, put, takeEvery } from "redux-saga/effects"
 import {
   GET_USERS,
   GET_USER_PROFILE,
+  GET_USER_PROFILE_SUCCESS,
   ADD_NEW_USER,
   DELETE_USER,
   UPDATE_USER
@@ -32,20 +33,20 @@ import {
 } from "../../helpers/fakebackend_helper"
 
 function* fetchUsers() {
-  try {
-    const response = yield call(getUsers)
-    yield put(getUsersSuccess(response))
-  } catch (error) {
-    yield put(getUsersFail(error))
-  }
+    try {
+      const response = yield call(getUsers)
+      yield put(getUsersSuccess(response))
+    } catch (error) {
+      yield put(getUsersFail(error))
+    }
 }
 
-function* fetchUserProfile() {
+function* fetchUserProfile({payload: id}) {
   try {
-    const response = yield call(getUserProfile)
+    const response = yield call(getUserProfile, id)
     yield put(getUserProfileSuccess(response))
   } catch (error) {
-    yield put(getUserProfileFail(error))
+    yield put(getUserProfileFail(true))
   }
 }
 

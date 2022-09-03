@@ -11,12 +11,26 @@ import ForgetPwd from "../pages/Authentication/ForgetPassword"
 
 // Dashboard
 import Dashboard from "../pages/Dashboard/index"
+// Products
+import Products from "../pages/Products"
+// Users
+import Users from "../pages/Users"
+import User from "../pages/Users/specific.js"
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: Dashboard },
 
   //profile
   { path: "/profile", component: UserProfile },
+
+  // products
+  { path: "/products", component: Products },
+
+  // users
+  { path: "/users", component: Users },
+
+  // users
+  { path: "/user/:id", component: User },
 
   // this route should be at the end of all other routes
   // eslint-disable-next-line react/display-name

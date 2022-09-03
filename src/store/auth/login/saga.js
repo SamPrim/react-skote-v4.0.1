@@ -10,32 +10,21 @@ import {
   postFakeLogin,
   postJwtLogin,
   postSocialLogin,
+  getJwtProfile
 } from "../../../helpers/fakebackend_helper"
+import accessToken from '../../../helpers/jwt-token-access/accessToken'
 
 const fireBaseBackend = getFirebaseBackend()
 
 function* loginUser({ payload: { user, history } }) {
   try {
-    if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
-      const response = yield call(
-        fireBaseBackend.loginUser,
-        user.email,
-        user.password
-      )
-      yield put(loginSuccess(response))
-    } else if (process.env.REACT_APP_DEFAULTAUTH === "jwt") {
+    if (process.env.REACT_APP_DEFAULTAUTH === "jwt") {
       const response = yield call(postJwtLogin, {
         email: user.email,
         password: user.password,
       })
-      localStorage.setItem("authUser", JSON.stringify(response))
-      yield put(loginSuccess(response))
-    } else if (process.env.REACT_APP_DEFAULTAUTH === "fake") {
-      const response = yield call(postFakeLogin, {
-        email: user.email,
-        password: user.password,
-      })
-      localStorage.setItem("authUser", JSON.stringify(response))
+      localStorage.setItem("accessToken", response.access_token)
+      localStorage.setItem("authUser", JSON.stringify(response.user))
       yield put(loginSuccess(response))
     }
     history.push("/dashboard")
@@ -47,6 +36,7 @@ function* loginUser({ payload: { user, history } }) {
 function* logoutUser({ payload: { history } }) {
   try {
     localStorage.removeItem("authUser")
+    localStorage.removeItem("accessToken")
 
     if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
       const response = yield call(fireBaseBackend.logout)
@@ -58,31 +48,9 @@ function* logoutUser({ payload: { history } }) {
   }
 }
 
-function* socialLogin({ payload: { data, history, type } }) {
-  try {
-    if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
-      const fireBaseBackend = getFirebaseBackend()
-      const response = yield call(
-        fireBaseBackend.socialLoginUser,
-        data,
-        type
-      )
-      localStorage.setItem("authUser", JSON.stringify(response))
-      yield put(loginSuccess(response))
-    } else {
-      const response = yield call(postSocialLogin, data)
-      localStorage.setItem("authUser", JSON.stringify(response))
-      yield put(loginSuccess(response))
-    }
-    history.push("/dashboard")
-  } catch (error) {
-    yield put(apiError(error))
-  }
-}
 
 function* authSaga() {
   yield takeEvery(LOGIN_USER, loginUser)
-  yield takeLatest(SOCIAL_LOGIN, socialLogin)
   yield takeEvery(LOGOUT_USER, logoutUser)
 }
 

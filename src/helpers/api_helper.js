@@ -5,7 +5,7 @@
   const token = accessToken
 
   //apply base url for axios
-  const API_URL = ""
+  const API_URL = "http://localhost:8000"
 
   const axiosApi = axios.create({
     baseURL: API_URL,

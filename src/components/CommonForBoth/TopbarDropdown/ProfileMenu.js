@@ -12,7 +12,7 @@ import { withRouter, Link } from "react-router-dom";
 import { withTranslation } from "react-i18next";
 
 // users
-import user1 from "../../../assets/images/users/avatar-1.jpg";
+import user1 from "../../../assets/images/logo-sm-light.png";
 
 import { connect } from "react-redux";
 
@@ -42,7 +42,7 @@ class ProfileMenu extends Component {
   componentDidMount() {
     const userData = getUserName();
     if (userData) {
-      this.setState({ name: userData.username })
+      this.setState({ name: userData.fullname })
     }
   }
 
@@ -50,7 +50,7 @@ class ProfileMenu extends Component {
     if (prevProps.success !== this.props.success) {
       const userData = getUserName();
       if (userData) {
-        this.setState({ name: userData.username })
+        this.setState({ name: userData.fullname })
       }
     }
   }

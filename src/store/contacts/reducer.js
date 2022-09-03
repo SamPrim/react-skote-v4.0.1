@@ -9,12 +9,13 @@ import {
   DELETE_USER_FAIL,
   GET_USER_PROFILE_SUCCESS,
   GET_USER_PROFILE_FAIL,
+  GET_USER_PROFILE
 } from "./actionTypes"
 
 const INIT_STATE = {
   users: [],
   userProfile: {},
-  error: {},
+  error: false,
 }
 
 const contacts = (state = INIT_STATE, action) => {

@@ -17,18 +17,8 @@ const fireBaseBackend = getFirebaseBackend();
 // Is user register successfull then direct plot user in redux.
 function* registerUser({ payload: { user } }) {
   try {
-    if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
-      const response = yield call(
-        fireBaseBackend.registerUser,
-        user.email,
-        user.password
-      );
-      yield put(registerUserSuccessful(response));
-    } else if (process.env.REACT_APP_DEFAULTAUTH === "jwt") {
-      const response = yield call(postJwtRegister, "/post-jwt-register", user);
-      yield put(registerUserSuccessful(response));
-    } else if (process.env.REACT_APP_DEFAULTAUTH === "fake") {
-      const response = yield call(postFakeRegister, user);
+    if (process.env.REACT_APP_DEFAULTAUTH === "jwt") {
+      const response = yield call(postJwtRegister, "/user/create", user);
       yield put(registerUserSuccessful(response));
     }
   } catch (error) {

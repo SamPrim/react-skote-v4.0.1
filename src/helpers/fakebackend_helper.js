@@ -4,7 +4,7 @@ import * as url from "./url_helper"
 
 // Gets the logged in user data from local session
 const getLoggedInUser = () => {
-  const user = localStorage.getItem("user")
+  const user = localStorage.getItem("authUser")
   if (user) return JSON.parse(user)
   return null
 }
@@ -13,6 +13,28 @@ const getLoggedInUser = () => {
 const isUserAuthenticated = () => {
   return getLoggedInUser() !== null
 }
+
+// Login Method
+const postJwtLogin = data => post(url.POST_FAKE_JWT_LOGIN, data)
+
+// get users
+export const getUsers = () => get("/user/all") // add this route get all users
+
+// add user
+export const addNewUser = user => post(url.ADD_NEW_USER, user)
+
+// update user
+export const updateUser = user => put(url.UPDATE_USER, user)
+
+// delete user
+export const deleteUser = user =>
+  del(url.DELETE_USER, { headers: { user } })
+
+export const getUserProfile = id => get("/user/"+id)
+
+
+
+//////////////////////////////////////////////////////////////
 
 // Register Method
 const postFakeRegister = data => {
@@ -51,6 +73,9 @@ const postFakeLogin = data => post(url.POST_FAKE_LOGIN, data)
 // postForgetPwd
 const postFakeForgetPwd = data => post(url.POST_FAKE_PASSWORD_FORGET, data)
 
+// User info
+const getJwtProfile = data => post(url.GET_JWT_PROFILE, data) // add api request to user me
+
 // Edit profile
 const postJwtProfile = data => post(url.POST_EDIT_JWT_PROFILE, data)
 
@@ -87,14 +112,14 @@ const postJwtRegister = (url, data) => {
     })
 }
 
-// Login Method
-const postJwtLogin = data => post(url.POST_FAKE_JWT_LOGIN, data)
-
 // postForgetPwd
 const postJwtForgetPwd = data => post(url.POST_FAKE_JWT_PASSWORD_FORGET, data)
 
 // postSocialLogin
 export const postSocialLogin = data => post(url.SOCIAL_LOGIN, data)
+
+
+
 
 // get Products
 export const getProducts = () => get(url.GET_PRODUCTS)
@@ -201,21 +226,6 @@ export const deleteProject = project =>
 // get tasks
 export const getTasks = () => get(url.GET_TASKS)
 
-// get contacts
-export const getUsers = () => get(url.GET_USERS)
-
-// add user
-export const addNewUser = user => post(url.ADD_NEW_USER, user)
-
-// update user
-export const updateUser = user => put(url.UPDATE_USER, user)
-
-// delete user
-export const deleteUser = user =>
-  del(url.DELETE_USER, { headers: { user } })
-
-export const getUserProfile = () => get(url.GET_USER_PROFILE)
-
 // get inboxmail
 export const getInboxMails = () => get(url.GET_INBOX_MAILS)
 
@@ -261,5 +271,6 @@ export {
   postJwtRegister,
   postJwtLogin,
   postJwtForgetPwd,
-  postJwtProfile
+  postJwtProfile,
+  getJwtProfile
 }

@@ -11,7 +11,7 @@ class Footer extends Component {
               <Col sm={6}>{new Date().getFullYear()} © Skote.</Col>
               <Col sm={6}>
                 <div className="text-sm-end d-none d-sm-block">
-                  Design & Develop by Themesbrand
+                  Design & Develop by Augentic Passcam Dev Prime
               </div>
               </Col>
             </Row>
