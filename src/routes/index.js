@@ -15,7 +15,10 @@ import Dashboard from "../pages/Dashboard/index"
 import Products from "../pages/Products"
 // Users
 import Users from "../pages/Users"
-import User from "../pages/Users/specific.js"
+import User from "../pages/Users/ContactsProfile/specific.js"
+import Groups from "../pages/Groups"
+import Countries from "pages/Countries"
+import Cities from "pages/Cities"
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -31,6 +34,15 @@ const authProtectedRoutes = [
 
   // users
   { path: "/user/:id", component: User },
+
+  // groups
+  { path: "/groups", component: Groups },
+
+  // countries
+  { path: "/countries", component: Countries },
+
+  // cities
+  { path: "/cities", component: Cities },
 
   // this route should be at the end of all other routes
   // eslint-disable-next-line react/display-name

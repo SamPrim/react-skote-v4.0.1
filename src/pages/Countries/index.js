@@ -37,22 +37,21 @@ import DeleteModal from "components/Common/DeleteModal";
 import { withTranslation } from "react-i18next";
 
 import {
-  getUsers,
-  addNewUser,
-  updateUser,
-  deleteUser,
-} from "store/contacts/actions";
+  getCountries,
+  addNewCountrie,
+  updateCountrie,
+  deleteCountrie,
+} from "store/countries/actions";
 
 import { isEmpty, size, map } from "lodash";
-import { getGroups } from "store/actions";
 
-class ContactsList extends Component {
+class CountriesList extends Component {
   constructor(props) {
     super(props);
     this.node = React.createRef();
     this.state = {
-      users: [],
-      user: "",
+      countries: [],
+      countrie: "",
       modal: false,
       deleteModal: false,
       contactListColumns: [
@@ -60,36 +59,16 @@ class ContactsList extends Component {
           text: "#",
           dataField: "id",
           sort: true,
-          formatter: (cellContent, user) => <>#{user.id}</>,
+          formatter: (cellContent, countrie) => <>#{countrie.id}</>,
         },
         {
           text: "Name",
-          dataField: "fullname",
-          sort: true,
-          formatter: (cellContent, user) => (
-            <>
-              <h5 className="font-size-14 mb-1">
-                <Link to={"/user/"+user.id} className="text-dark">
-                  {user.fullname}
-                </Link>
-              </h5>
-              <p className="text-muted mb-0">{user.groups.name}</p>
-            </>
-          ),
-        },
-        {
-          dataField: "email",
-          text: "Email",
+          dataField: "name",
           sort: true,
         },
         {
-          dataField: "is_active",
-          text: "Status",
-          sort: true,
-        },
-        {
-          dataField: "groups.name",
-          text: "Groupe",
+          dataField: "description",
+          text: "Description",
           sort: true,
         },
         {
@@ -97,26 +76,20 @@ class ContactsList extends Component {
           isDummyField: true,
           editable: false,
           text: "Action",
-          formatter: (cellContent, user) => (
+          formatter: (cellContent, countrie) => (
             <div className="d-flex gap-3">
-              <Link className="text-info" to={"/user/"+user.id}>
-                <i
-                  className="mdi mdi-eye font-size-18"
-                  id="edittooltip"
-                ></i>
-              </Link>
               <Link className="text-success" to="#">
                 <i
                   className="mdi mdi-pencil font-size-18"
                   id="edittooltip"
-                  onClick={() => this.handleUserClick(user)}
+                  onClick={() => this.handleCountrieClick(countrie)}
                 ></i>
               </Link>
               <Link className="text-danger" to="#">
                 <i
                   className="mdi mdi-delete font-size-18"
                   id="deletetooltip"
-                  onClick={() => this.onClickDelete(user)}
+                  onClick={() => this.onClickDelete(countrie)}
                 ></i>
               </Link>
             </div>
@@ -124,20 +97,20 @@ class ContactsList extends Component {
         },
       ],
     };
-    this.handleUserClick = this.handleUserClick.bind(this);
+    this.handleCountrieClick = this.handleCountrieClick.bind(this);
     this.toggle = this.toggle.bind(this);
-    this.handleUserClicks = this.handleUserClicks.bind(this);
+    this.handleCountrieClicks = this.handleCountrieClicks.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
   }
   
 
   componentDidMount() {
-    const { users, onGetUsers, onGetGroups } = this.props;
-    if (users && !users.length) {
-      onGetUsers();
-      onGetGroups()
+    const { countries, onGetCountries } = this.props;
+    if (countries && !countries.length) {
+      onGetCountries();
     }
-    this.setState({ users });
+    this.setState({ countries });
+    console.log(this.state.countries);
   }
 
   toggle() {
@@ -146,17 +119,17 @@ class ContactsList extends Component {
     }));
   }
 
-  handleUserClicks = () => {
-    this.setState({ user: "", isEdit: false });
+  handleCountrieClicks = () => {
+    this.setState({ countrie: "", isEdit: false });
     this.toggle();
   };
 
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const { users } = this.props;
-    if (!isEmpty(users) && size(prevProps.users) !== size(users)) {
-      this.setState({ users: {}, isEdit: false });
-        // this.setState({ ...this.state, users: this.props.usersData });
+    const { countries } = this.props;
+    if (!isEmpty(countries) && size(prevProps.countries) !== size(countries)) {
+      this.setState({ countries: {}, isEdit: false });
+        // this.setState({ ...this.state, countries: this.props.countriesData });
     }
   }
 
@@ -180,31 +153,28 @@ class ContactsList extends Component {
     }));
   };
 
-  onClickDelete = users => {
-    this.setState({ users: users });
+  onClickDelete = countries => {
+    this.setState({ countries: countries });
     this.setState({ deleteModal: true });
   };
 
-  handleDeleteUser = () => {
-    const { onDeleteUser } = this.props;
-    const { users } = this.state;
-    if (users.id !== undefined) {
-      onDeleteUser(users, users.id);
+  handleDeleteCountrie = () => {
+    const { onDeleteCountrie } = this.props;
+    const { countries } = this.state;
+    if (countries.id !== undefined) {
+      onDeleteCountrie(countries, countries.id);
       this.setState({ deleteModal: false });
     }
   };
 
-  handleUserClick = arg => {
-    const user = arg;
+  handleCountrieClick = arg => {
+    const countrie = arg;
 
     this.setState({
-      user: {
-        id: user.id,
-        fullname: user.fullname,
-        email: user.email,
-        is_active: user.is_active,
-        groups: user.groups.name,
-        hashed_password: "Erty1234!"
+      countrie: {
+        id: countrie.id,
+        name: countrie.name,
+        description: countrie.description
       },
       isEdit: true,
     });
@@ -215,21 +185,20 @@ class ContactsList extends Component {
   render() {
     //meta title
 
-    document.title = "User | Admin";
+    document.title = "Countrie | Admin";
 
-    // const { users } = this.state
+    // const { countrie } = this.state
     const { SearchBar } = Search;
 
-    const { users } = this.props;
-    const { groups } = this.props.groups
+    const { countries } = this.props;
 
     const { isEdit, deleteModal } = this.state;
 
-    const { onAddNewUser, onUpdateUser } = this.props;
-    const user = this.state.user;
+    const { onAddNewCountrie, onUpdateCountrie } = this.props;
+    const countrie = this.state.countrie;
     const pageOptions = {
       sizePerPage: 10,
-      totalSize: users.length, // replace later with size(users),
+      totalSize: countries.length, // replace later with size(countrie),
       custom: true,
     };
 
@@ -244,19 +213,17 @@ class ContactsList extends Component {
       mode: "checkbox",
     };
 
-    
-
     return (
       <React.Fragment>
         <DeleteModal
           show={deleteModal}
-          onDeleteClick={this.handleDeleteUser}
+          onDeleteClick={this.handleDeleteCountrie}
           onCloseClick={() => this.setState({ deleteModal: false })}
         />
         <div className="page-content">
           <Container fluid>
             {/* Render Breadcrumbs */}
-            <Breadcrumbs title="Users" breadcrumbItem="Users List" />
+            <Breadcrumbs title="Countries" breadcrumbItem="Countries List" />
             <Row>
               <Col lg="12">
                 <Card>
@@ -265,13 +232,13 @@ class ContactsList extends Component {
                       pagination={paginationFactory(pageOptions)}
                       keyField="id"
                       columns={this.state.contactListColumns}
-                      data={users}
+                      data={countries}
                     >
                       {({ paginationProps, paginationTableProps }) => (
                         <ToolkitProvider
                           keyField="id"
                           columns={this.state.contactListColumns}
-                          data={users}
+                          data={countries}
                           search
                         >
                           {toolkitprops => (
@@ -292,11 +259,10 @@ class ContactsList extends Component {
                                     <Button
                                       color="primary"
                                       className="font-16 btn-block btn btn-primary"
-                                      onClick={this.handleUserClicks}
+                                      onClick={this.handleCountrieClicks}
                                     >
-                                      
                                       <i className="mdi mdi-plus-circle-outline me-1" />
-                                      {this.props.t("Create New User")}
+                                      {this.props.t("Create New Countrie")}
                                     </Button>
                                   </div>
                                 </Col>
@@ -326,56 +292,45 @@ class ContactsList extends Component {
                                         toggle={this.toggle}
                                         tag="h4"
                                       >
-                                        {!!isEdit ? this.props.t("Edit User") : this.props.t("Add User")}
+                                        {!!isEdit ? this.props.t("Edit Countrie") : this.props.t("Add Countrie")}
                                       </ModalHeader>
                                       <ModalBody>
                                         <Formik
                                           enableReinitialize={true}
                                           initialValues={{
-                                            fullname: (user && user.fullname) || "",
-                                            email:
-                                              (user && user.email) || "",
-                                            is_active: (user && user.is_active) || [],
-                                            group_id:
-                                              (user && user.groups.name) || "",
+                                            name: (countrie && countrie.name) || "",
+                                            description:
+                                              (countrie && countrie.description) || ""
                                           }}
                                           validationSchema={Yup.object().shape({
-                                            fullname: Yup.string().required(
+                                            name: Yup.string().required(
                                               this.props.t("Please Enter Name")
                                             ),
-                                            email: Yup.string().required(
-                                              this.props.t("Please Enter email")
-                                            ),
-                                            group_id: Yup.string().required(
-                                              "Please Enter Your Group"
+                                            description: Yup.string().required(
+                                              this.props.t("Please Enter Description")
                                             ),
                                           })}
                                           onSubmit={values => {
                                             if (isEdit) {
-                                              const updateUser = {
-                                                id: user.id,
-                                                fullname: values.fullname,
-                                                email: values.email,
-                                                is_active: true,
-                                                group_id: values.group_id,
+                                              const updateCountrie = {
+                                                id: countrie.id,
+                                                name: values.name,
+                                                description: values.description
                                               };
 
-                                              // update user
-                                              onUpdateUser(updateUser);
+                                              // update countrie
+                                              onUpdateCountrie(updateCountrie);
                                             } else {
-                                              const newUser = {
-                                                fullname: values["fullname"],
-                                                email:
-                                                  values["email"],
-                                                is_active: true,
-                                                hashed_password: "Erty1234!",
-                                                group_id: values['group_id'],
+                                              const newCountrie = {
+                                                name: values["name"],
+                                                description:
+                                                  values["description"],
                                               };
-                                              // save new user
-                                              onAddNewUser(newUser);
+                                              // save new Countrie
+                                              onAddNewCountrie(newCountrie);
                                             }
                                             this.setState({
-                                              selectedUser: null,
+                                              selectedCountrie: null,
                                             });
                                             this.toggle();
                                           }}
@@ -389,7 +344,7 @@ class ContactsList extends Component {
                                                       Name
                                                     </Label>
                                                     <Field
-                                                      name="fullname"
+                                                      name="name"
                                                       type="text"
                                                       className={
                                                         "form-control" +
@@ -400,76 +355,31 @@ class ContactsList extends Component {
                                                       }
                                                     />
                                                     <ErrorMessage
-                                                      name="fullname"
+                                                      name="name"
                                                       component="div"
                                                       className="invalid-feedback"
                                                     />
                                                   </div>
                                                   <div className="mb-3">
                                                     <Label className="form-label">
-                                                      Email
+                                                      Description
                                                     </Label>
                                                     <Field
-                                                      name="email"
-                                                      type="text"
+                                                      name="description"
+                                                      type="textarea"
                                                       className={
                                                         "form-control" +
-                                                        (errors.email &&
-                                                        touched.email
+                                                        (errors.description &&
+                                                        touched.description
                                                           ? " is-invalid"
                                                           : "")
                                                       }
                                                     />
                                                     <ErrorMessage
-                                                      name="email"
+                                                      name="description"
                                                       component="div"
                                                       className="invalid-feedback"
                                                     />
-                                                  </div>
-                                                  {/* <div className="mb-3">
-                                                    <Label className="form-label">
-                                                      Email
-                                                    </Label>
-                                                    <Field
-                                                      name="email"
-                                                      type="text"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.email &&
-                                                        touched.email
-                                                          ? " is-invalid"
-                                                          : "")
-                                                      }
-                                                    />
-                                                    <ErrorMessage
-                                                      name="email"
-                                                      component="div"
-                                                      className="invalid-feedback"
-                                                    />
-                                                  </div> */}
-                                                  <div className="mb-3">
-                                                    <Label className="form-label">
-                                                      Groups
-                                                    </Label>
-                                                    <Field
-                                                      name="group_id"
-                                                      as="select"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.tags &&
-                                                        touched.tags
-                                                          ? " is-invalid"
-                                                          : "")
-                                                      }
-                                                      multiple={false}
-                                                    >
-                                                      <option>---</option>
-                                                      {
-                                                        this.props.groups.map((group) => (
-                                                          <option key={group.id} value={group.id}>{group.name}</option>
-                                                        ))
-                                                      }
-                                                    </Field>
                                                   </div>
                                                 </Col>
                                               </Row>
@@ -516,32 +426,28 @@ class ContactsList extends Component {
   }
 }
 
-ContactsList.propTypes = {
-  users: PropTypes.array,
-  groups: PropTypes.array,
+CountriesList.propTypes = {
+  countries: PropTypes.array,
   className: PropTypes.any,
-  onGetUsers: PropTypes.func,
-  onAddNewUser: PropTypes.func,
-  onDeleteUser: PropTypes.func,
-  onUpdateUser: PropTypes.func,
-  onGetGroups: PropTypes.func,
+  onGetCountries: PropTypes.func,
+  onAddNewCountrie: PropTypes.func,
+  onDeleteCountrie: PropTypes.func,
+  onUpdateCountrie: PropTypes.func,
   t: PropTypes.func,
 };
 
-const mapStateToProps = ({ contacts, Groups }) => ({
-  users: contacts.users,
-  groups: Groups.groups
+const mapStateToProps = ({ Countries }) => ({
+  countries: Countries.countries,
 });
 
 const mapDispatchToProps = dispatch => ({
-  onGetUsers: () => dispatch(getUsers()),
-  onAddNewUser: user => dispatch(addNewUser(user)),
-  onUpdateUser: user => dispatch(updateUser(user)),
-  onDeleteUser: user => dispatch(deleteUser(user)),
-  onGetGroups: () => dispatch(getGroups()),
+  onGetCountries: () => dispatch(getCountries()),
+  onAddNewCountrie: countrie => dispatch(addNewCountrie(countrie)),
+  onUpdateCountrie: countrie => dispatch(updateCountrie(countrie)),
+  onDeleteCountrie: countrie => dispatch(deleteCountrie(countrie)),
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(withTranslation()(ContactsList)));
+)(withRouter(withTranslation()(CountriesList)));

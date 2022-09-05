@@ -1,4 +1,5 @@
 import { call, put, takeEvery } from "redux-saga/effects"
+import axios from "axios"
 
 // Crypto Redux States
 import {
@@ -52,17 +53,20 @@ function* fetchUserProfile({payload: id}) {
 
 function* onAddNewUser({ payload: user }) {
   try {
+    console.log(user);
     const response = yield call(addNewUser, user)
-    yield put(addUserSuccess(response))
+    yield fetchUsers()
+    // yield put(addUserSuccess(response))
   } catch (error) {
-
+    console.log(error);
     yield put(addUserFail(error))
   }
 }
 
 function* onUpdateUser({ payload: user }) {
   try {
-    const response = yield call(updateUser, user)
+    const response = yield call(updateUser, user, user.id)
+    yield fetchUsers()
     yield put(updateUserSuccess(response))
   } catch (error) {
     yield put(updateUserFail(error))
@@ -71,7 +75,8 @@ function* onUpdateUser({ payload: user }) {
 
 function* onDeleteUser({ payload: user }) {
   try {
-    const response = yield call(deleteUser, user)
+    const response = yield call(deleteUser, user, user.id)
+    yield fetchUsers()
     yield put(deleteUserSuccess(response))
   } catch (error) {
     yield put(deleteUserFail(error))

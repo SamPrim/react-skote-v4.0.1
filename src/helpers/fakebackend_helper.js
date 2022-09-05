@@ -1,5 +1,5 @@
 import axios from "axios"
-import { del, get, post, put } from "./api_helper"
+import { del, get, post, put, API_URL } from "./api_helper"
 import * as url from "./url_helper"
 
 // Gets the logged in user data from local session
@@ -14,25 +14,54 @@ const isUserAuthenticated = () => {
   return getLoggedInUser() !== null
 }
 
+////////////////
 // Login Method
 const postJwtLogin = data => post(url.POST_FAKE_JWT_LOGIN, data)
 
+/////////////
 // get users
 export const getUsers = () => get("/user/all") // add this route get all users
-
 // add user
-export const addNewUser = user => post(url.ADD_NEW_USER, user)
-
+export const addNewUser = data => post(API_URL+"/user/create/", data) // add this route for new user
 // update user
-export const updateUser = user => put(url.UPDATE_USER, user)
-
+export const updateUser = (user, id) => put(API_URL+"/user/"+id+"/update", user) // add this route for update user
 // delete user
-export const deleteUser = user =>
-  del(url.DELETE_USER, { headers: { user } })
-
+export const deleteUser = (user, id) =>
+  del(API_URL+"/user/"+id+"/delete", { headers: { user } }) // add this route for delete user
 export const getUserProfile = id => get("/user/"+id)
 
+/////////////
+// get groups
+export const getGroups = () => get("/user/groups/?skip=0&limit=100") // add this route get all groups
+// add groups
+export const addNewGroup = group => post("/user/group", group) // add this route add a groups
+// update group
+export const updateGroup = (group, id) => put(API_URL+"/user/"+id+"/update_group", group) // add this route for update group
+// delete group
+export const deleteGroup = (group, id) =>
+  del(API_URL+"/user/group/"+id+"/delete", { headers: { group } }) // add this route for delete group
 
+////////////////
+// get countries
+export const getCountries = () => get("/entrepot/countries?skip=0&limit=100") // add this route get all countries
+// add countries
+export const addNewCountrie = countrie => post("/entrepot/countrie", countrie) // add this route add a countries
+// update countrie
+export const updateCountrie = (countrie, id) => put(API_URL+"/entrepot/"+id+"/countrie", countrie) // add this route for update countrie
+// delete countrie
+export const deleteCountrie = (countrie, id) =>
+  del(API_URL+"/entrepot/"+id+"/countrie", { headers: { countrie } }) // add this route for delete group
+
+/////////////
+// get cities
+export const getCities = () => get("/entrepot/cities?skip=0&limit=100") // add this route get all cities
+// add citie
+export const addNewCitie= citie => post("/entrepot/citie", citie) // add this route add a cities
+// update citie
+export const updateCitie = (citie, id) => put(API_URL+"/entrepot/"+id+"/citie", citie) // add this route for update citie
+// delete citie
+export const deleteCitie = (citie, id) =>
+  del(API_URL+"/entrepot/"+id+"/citie", { headers: { citie } }) // add this route for delete citie
 
 //////////////////////////////////////////////////////////////
 
@@ -146,9 +175,6 @@ export const getCategories = () => get(url.GET_CATEGORIES)
 
 // get chats
 export const getChats = () => get(url.GET_CHATS)
-
-// get groups
-export const getGroups = () => get(url.GET_GROUPS)
 
 // get Contacts
 export const getContacts = () => get(url.GET_CONTACTS)

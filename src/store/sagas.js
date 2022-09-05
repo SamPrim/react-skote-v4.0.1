@@ -7,7 +7,7 @@ import ForgetSaga from "./auth/forgetpwd/saga"
 import ProfileSaga from "./auth/profile/saga"
 import LayoutSaga from "./layout/saga"
 import ecommerceSaga from "./e-commerce/saga"
-import calendarSaga from "./calendar/saga"
+import countriesSaga from "./countries/saga"
 import chatSaga from "./chat/saga"
 import cryptoSaga from "./crypto/saga"
 import invoiceSaga from "./invoices/saga"
@@ -17,6 +17,8 @@ import mailsSaga from "./mails/saga"
 import contactsSaga from "./contacts/saga";
 import dashboardSaga from "./dashboard/saga";
 import dashboardSaasSaga from "./dashboard-saas/saga";
+import groupSaga from "./groups/saga";
+import citiesSaga from "./cities/saga"
 
 export default function* rootSaga() {
   yield all([
@@ -27,7 +29,7 @@ export default function* rootSaga() {
     fork(ProfileSaga),
     fork(LayoutSaga),
     fork(ecommerceSaga),
-    fork(calendarSaga),
+    fork(countriesSaga),
     fork(chatSaga),
     fork(mailsSaga),
     fork(cryptoSaga),
@@ -36,6 +38,8 @@ export default function* rootSaga() {
     fork(tasksSaga),
     fork(contactsSaga),
     fork(dashboardSaga),
-    fork(dashboardSaasSaga)
+    fork(dashboardSaasSaga),
+    fork(groupSaga),
+    fork(citiesSaga),
   ])
 }

@@ -40,7 +40,7 @@ export const GET_CATEGORIES = "/categories"
 
 //CHATS
 export const GET_CHATS = "/chats"
-export const GET_GROUPS = "/groups"
+export const GET_GROUPS = "/user/groups/"
 export const GET_CONTACTS = "/contacts"
 export const GET_MESSAGES = "/messages"
 export const ADD_MESSAGE = "/add/messages"

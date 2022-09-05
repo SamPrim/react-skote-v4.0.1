@@ -10,7 +10,7 @@ export * from "./auth/profile/actions"
 export * from "./e-commerce/actions"
 
 //Calendar
-export * from "./calendar/actions"
+// export * from "./calendar/actions"
 
 //chat
 export * from "./chat/actions"

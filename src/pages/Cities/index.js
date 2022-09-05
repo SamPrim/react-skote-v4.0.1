@@ -37,22 +37,24 @@ import DeleteModal from "components/Common/DeleteModal";
 import { withTranslation } from "react-i18next";
 
 import {
-  getUsers,
-  addNewUser,
-  updateUser,
-  deleteUser,
-} from "store/contacts/actions";
+  getCities,
+  addNewCitie,
+  updateCitie,
+  deleteCitie,
+} from "store/cities/actions";
+import {
+    getCountries,
+  } from "store/countries/actions";
 
 import { isEmpty, size, map } from "lodash";
-import { getGroups } from "store/actions";
 
-class ContactsList extends Component {
+class CitiesList extends Component {
   constructor(props) {
     super(props);
     this.node = React.createRef();
     this.state = {
-      users: [],
-      user: "",
+      cities: [],
+      citie: "",
       modal: false,
       deleteModal: false,
       contactListColumns: [
@@ -60,63 +62,42 @@ class ContactsList extends Component {
           text: "#",
           dataField: "id",
           sort: true,
-          formatter: (cellContent, user) => <>#{user.id}</>,
+          formatter: (cellContent, citie) => <>#{citie.id}</>,
         },
         {
           text: "Name",
-          dataField: "fullname",
-          sort: true,
-          formatter: (cellContent, user) => (
-            <>
-              <h5 className="font-size-14 mb-1">
-                <Link to={"/user/"+user.id} className="text-dark">
-                  {user.fullname}
-                </Link>
-              </h5>
-              <p className="text-muted mb-0">{user.groups.name}</p>
-            </>
-          ),
-        },
-        {
-          dataField: "email",
-          text: "Email",
+          dataField: "name",
           sort: true,
         },
         {
-          dataField: "is_active",
-          text: "Status",
+          dataField: "description",
+          text: "Description",
           sort: true,
         },
         {
-          dataField: "groups.name",
-          text: "Groupe",
-          sort: true,
+            dataField: "countrie.name",
+            text: "Countrie",
+            sort: true,
         },
         {
           dataField: "menu",
           isDummyField: true,
           editable: false,
           text: "Action",
-          formatter: (cellContent, user) => (
+          formatter: (cellContent, citie) => (
             <div className="d-flex gap-3">
-              <Link className="text-info" to={"/user/"+user.id}>
-                <i
-                  className="mdi mdi-eye font-size-18"
-                  id="edittooltip"
-                ></i>
-              </Link>
               <Link className="text-success" to="#">
                 <i
                   className="mdi mdi-pencil font-size-18"
                   id="edittooltip"
-                  onClick={() => this.handleUserClick(user)}
+                  onClick={() => this.handleCitieClick(citie)}
                 ></i>
               </Link>
               <Link className="text-danger" to="#">
                 <i
                   className="mdi mdi-delete font-size-18"
                   id="deletetooltip"
-                  onClick={() => this.onClickDelete(user)}
+                  onClick={() => this.onClickDelete(citie)}
                 ></i>
               </Link>
             </div>
@@ -124,20 +105,21 @@ class ContactsList extends Component {
         },
       ],
     };
-    this.handleUserClick = this.handleUserClick.bind(this);
+    this.handleCitieClick = this.handleCitieClick.bind(this);
     this.toggle = this.toggle.bind(this);
-    this.handleUserClicks = this.handleUserClicks.bind(this);
+    this.handleCitieClicks = this.handleCitieClicks.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
   }
   
 
   componentDidMount() {
-    const { users, onGetUsers, onGetGroups } = this.props;
-    if (users && !users.length) {
-      onGetUsers();
-      onGetGroups()
+    const { cities, onGetCities, onGetCountries } = this.props;
+    if (cities && !cities.length) {
+      onGetCities();
+      onGetCountries();
     }
-    this.setState({ users });
+    this.setState({ cities });
+    console.log(this.state.cities);
   }
 
   toggle() {
@@ -146,17 +128,17 @@ class ContactsList extends Component {
     }));
   }
 
-  handleUserClicks = () => {
-    this.setState({ user: "", isEdit: false });
+  handleCitieClicks = () => {
+    this.setState({ citie: "", isEdit: false });
     this.toggle();
   };
 
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const { users } = this.props;
-    if (!isEmpty(users) && size(prevProps.users) !== size(users)) {
-      this.setState({ users: {}, isEdit: false });
-        // this.setState({ ...this.state, users: this.props.usersData });
+    const { cities } = this.props;
+    if (!isEmpty(cities) && size(prevProps.cities) !== size(cities)) {
+      this.setState({ cities: {}, isEdit: false });
+        // this.setState({ ...this.state, cities: this.props.citiesData });
     }
   }
 
@@ -180,31 +162,29 @@ class ContactsList extends Component {
     }));
   };
 
-  onClickDelete = users => {
-    this.setState({ users: users });
+  onClickDelete = cities => {
+    this.setState({ cities: cities });
     this.setState({ deleteModal: true });
   };
 
-  handleDeleteUser = () => {
-    const { onDeleteUser } = this.props;
-    const { users } = this.state;
-    if (users.id !== undefined) {
-      onDeleteUser(users, users.id);
+  handleDeleteCitie = () => {
+    const { onDeleteCitie } = this.props;
+    const { cities } = this.state;
+    if (cities.id !== undefined) {
+      onDeleteCitie(cities, cities.id);
       this.setState({ deleteModal: false });
     }
   };
 
-  handleUserClick = arg => {
-    const user = arg;
+  handleCitieClick = arg => {
+    const citie = arg;
 
     this.setState({
-      user: {
-        id: user.id,
-        fullname: user.fullname,
-        email: user.email,
-        is_active: user.is_active,
-        groups: user.groups.name,
-        hashed_password: "Erty1234!"
+      citie: {
+        id: citie.id,
+        name: citie.name,
+        description: citie.description,
+        countrie: citie.countrie.name
       },
       isEdit: true,
     });
@@ -215,21 +195,20 @@ class ContactsList extends Component {
   render() {
     //meta title
 
-    document.title = "User | Admin";
+    document.title = "Citie | Admin";
 
-    // const { users } = this.state
+    // const { citie } = this.state
     const { SearchBar } = Search;
 
-    const { users } = this.props;
-    const { groups } = this.props.groups
+    const { cities } = this.props;
 
     const { isEdit, deleteModal } = this.state;
 
-    const { onAddNewUser, onUpdateUser } = this.props;
-    const user = this.state.user;
+    const { onAddNewCitie, onUpdateCitie } = this.props;
+    const citie = this.state.citie;
     const pageOptions = {
       sizePerPage: 10,
-      totalSize: users.length, // replace later with size(users),
+      totalSize: cities.length, // replace later with size(citie),
       custom: true,
     };
 
@@ -244,19 +223,17 @@ class ContactsList extends Component {
       mode: "checkbox",
     };
 
-    
-
     return (
       <React.Fragment>
         <DeleteModal
           show={deleteModal}
-          onDeleteClick={this.handleDeleteUser}
+          onDeleteClick={this.handleDeleteCitie}
           onCloseClick={() => this.setState({ deleteModal: false })}
         />
         <div className="page-content">
           <Container fluid>
             {/* Render Breadcrumbs */}
-            <Breadcrumbs title="Users" breadcrumbItem="Users List" />
+            <Breadcrumbs title="Cities" breadcrumbItem="Cities List" />
             <Row>
               <Col lg="12">
                 <Card>
@@ -265,13 +242,13 @@ class ContactsList extends Component {
                       pagination={paginationFactory(pageOptions)}
                       keyField="id"
                       columns={this.state.contactListColumns}
-                      data={users}
+                      data={cities}
                     >
                       {({ paginationProps, paginationTableProps }) => (
                         <ToolkitProvider
                           keyField="id"
                           columns={this.state.contactListColumns}
-                          data={users}
+                          data={cities}
                           search
                         >
                           {toolkitprops => (
@@ -292,11 +269,10 @@ class ContactsList extends Component {
                                     <Button
                                       color="primary"
                                       className="font-16 btn-block btn btn-primary"
-                                      onClick={this.handleUserClicks}
+                                      onClick={this.handleCitieClicks}
                                     >
-                                      
                                       <i className="mdi mdi-plus-circle-outline me-1" />
-                                      {this.props.t("Create New User")}
+                                      {this.props.t("Create New Citie")}
                                     </Button>
                                   </div>
                                 </Col>
@@ -326,56 +302,50 @@ class ContactsList extends Component {
                                         toggle={this.toggle}
                                         tag="h4"
                                       >
-                                        {!!isEdit ? this.props.t("Edit User") : this.props.t("Add User")}
+                                        {!!isEdit ? this.props.t("Edit Citie") : this.props.t("Add Citie")}
                                       </ModalHeader>
                                       <ModalBody>
                                         <Formik
                                           enableReinitialize={true}
                                           initialValues={{
-                                            fullname: (user && user.fullname) || "",
-                                            email:
-                                              (user && user.email) || "",
-                                            is_active: (user && user.is_active) || [],
-                                            group_id:
-                                              (user && user.groups.name) || "",
+                                            name: (citie && citie.name) || "",
+                                            description:
+                                              (citie && citie.description) || ""
                                           }}
                                           validationSchema={Yup.object().shape({
-                                            fullname: Yup.string().required(
+                                            name: Yup.string().required(
                                               this.props.t("Please Enter Name")
                                             ),
-                                            email: Yup.string().required(
-                                              this.props.t("Please Enter email")
+                                            description: Yup.string().required(
+                                              this.props.t("Please Enter Description")
                                             ),
-                                            group_id: Yup.string().required(
-                                              "Please Enter Your Group"
-                                            ),
+                                            countrie_id: Yup.string().required(
+                                                this.props.t("Please Enter Countrie")
+                                              ),
                                           })}
                                           onSubmit={values => {
                                             if (isEdit) {
-                                              const updateUser = {
-                                                id: user.id,
-                                                fullname: values.fullname,
-                                                email: values.email,
-                                                is_active: true,
-                                                group_id: values.group_id,
+                                              const updateCitie = {
+                                                id: citie.id,
+                                                name: values.name,
+                                                description: values.description,
+                                                countrie_id: values.countrie_id
                                               };
 
-                                              // update user
-                                              onUpdateUser(updateUser);
+                                              // update citie
+                                              onUpdateCitie(updateCitie);
                                             } else {
-                                              const newUser = {
-                                                fullname: values["fullname"],
-                                                email:
-                                                  values["email"],
-                                                is_active: true,
-                                                hashed_password: "Erty1234!",
-                                                group_id: values['group_id'],
+                                              const newCitie = {
+                                                name: values["name"],
+                                                description:
+                                                  values["description"],
+                                                countrie_id: values["countrie_id"]
                                               };
-                                              // save new user
-                                              onAddNewUser(newUser);
+                                              // save new Citie
+                                              onAddNewCitie(newCitie);
                                             }
                                             this.setState({
-                                              selectedUser: null,
+                                              selectedCitie: null,
                                             });
                                             this.toggle();
                                           }}
@@ -389,7 +359,7 @@ class ContactsList extends Component {
                                                       Name
                                                     </Label>
                                                     <Field
-                                                      name="fullname"
+                                                      name="name"
                                                       type="text"
                                                       className={
                                                         "form-control" +
@@ -400,59 +370,17 @@ class ContactsList extends Component {
                                                       }
                                                     />
                                                     <ErrorMessage
-                                                      name="fullname"
+                                                      name="name"
                                                       component="div"
                                                       className="invalid-feedback"
                                                     />
                                                   </div>
                                                   <div className="mb-3">
                                                     <Label className="form-label">
-                                                      Email
+                                                      Countrie
                                                     </Label>
                                                     <Field
-                                                      name="email"
-                                                      type="text"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.email &&
-                                                        touched.email
-                                                          ? " is-invalid"
-                                                          : "")
-                                                      }
-                                                    />
-                                                    <ErrorMessage
-                                                      name="email"
-                                                      component="div"
-                                                      className="invalid-feedback"
-                                                    />
-                                                  </div>
-                                                  {/* <div className="mb-3">
-                                                    <Label className="form-label">
-                                                      Email
-                                                    </Label>
-                                                    <Field
-                                                      name="email"
-                                                      type="text"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.email &&
-                                                        touched.email
-                                                          ? " is-invalid"
-                                                          : "")
-                                                      }
-                                                    />
-                                                    <ErrorMessage
-                                                      name="email"
-                                                      component="div"
-                                                      className="invalid-feedback"
-                                                    />
-                                                  </div> */}
-                                                  <div className="mb-3">
-                                                    <Label className="form-label">
-                                                      Groups
-                                                    </Label>
-                                                    <Field
-                                                      name="group_id"
+                                                      name="countrie_id"
                                                       as="select"
                                                       className={
                                                         "form-control" +
@@ -465,11 +393,32 @@ class ContactsList extends Component {
                                                     >
                                                       <option>---</option>
                                                       {
-                                                        this.props.groups.map((group) => (
-                                                          <option key={group.id} value={group.id}>{group.name}</option>
+                                                        this.props.countries.map((countrie) => (
+                                                          <option key={countrie.id} value={countrie.id}>{countrie.name}</option>
                                                         ))
                                                       }
                                                     </Field>
+                                                  </div>
+                                                  <div className="mb-3">
+                                                    <Label className="form-label">
+                                                      Description
+                                                    </Label>
+                                                    <Field
+                                                      name="description"
+                                                      type="textarea"
+                                                      className={
+                                                        "form-control" +
+                                                        (errors.description &&
+                                                        touched.description
+                                                          ? " is-invalid"
+                                                          : "")
+                                                      }
+                                                    />
+                                                    <ErrorMessage
+                                                      name="description"
+                                                      component="div"
+                                                      className="invalid-feedback"
+                                                    />
                                                   </div>
                                                 </Col>
                                               </Row>
@@ -516,32 +465,32 @@ class ContactsList extends Component {
   }
 }
 
-ContactsList.propTypes = {
-  users: PropTypes.array,
-  groups: PropTypes.array,
+CitiesList.propTypes = {
+  cities: PropTypes.array,
+  countries: PropTypes.array,
   className: PropTypes.any,
-  onGetUsers: PropTypes.func,
-  onAddNewUser: PropTypes.func,
-  onDeleteUser: PropTypes.func,
-  onUpdateUser: PropTypes.func,
-  onGetGroups: PropTypes.func,
+  onGetCities: PropTypes.func,
+  onAddNewCitie: PropTypes.func,
+  onDeleteCitie: PropTypes.func,
+  onUpdateCitie: PropTypes.func,
+  onGetCountries: PropTypes.func,
   t: PropTypes.func,
 };
 
-const mapStateToProps = ({ contacts, Groups }) => ({
-  users: contacts.users,
-  groups: Groups.groups
+const mapStateToProps = ({ Cities, Countries }) => ({
+  cities: Cities.cities,
+  countries: Countries.countries
 });
 
 const mapDispatchToProps = dispatch => ({
-  onGetUsers: () => dispatch(getUsers()),
-  onAddNewUser: user => dispatch(addNewUser(user)),
-  onUpdateUser: user => dispatch(updateUser(user)),
-  onDeleteUser: user => dispatch(deleteUser(user)),
-  onGetGroups: () => dispatch(getGroups()),
+  onGetCities: () => dispatch(getCities()),
+  onAddNewCitie: citie => dispatch(addNewCitie(citie)),
+  onUpdateCitie: citie => dispatch(updateCitie(citie)),
+  onDeleteCitie: citie => dispatch(deleteCitie(citie)),
+  onGetCountries: () => dispatch(getCountries()),
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(withTranslation()(ContactsList)));
+)(withRouter(withTranslation()(CitiesList)));

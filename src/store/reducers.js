@@ -12,8 +12,8 @@ import Profile from "./auth/profile/reducer"
 //E-commerce
 import ecommerce from "./e-commerce/reducer"
 
-//Calendar
-import calendar from "./calendar/reducer"
+//Countries
+import Countries from "./countries/reducer"
 
 //chat
 import chat from "./chat/reducer"
@@ -42,6 +42,12 @@ import Dashboard from "./dashboard/reducer";
 //Dasboard saas
 import DashboardSaas from "./dashboard-saas/reducer";
 
+//Groups
+import Groups from "./groups/reducer";
+
+// Cities
+import Cities from "./cities/reducer"
+
 const rootReducer = combineReducers({
   // public
   Layout,
@@ -50,16 +56,18 @@ const rootReducer = combineReducers({
   ForgetPassword,
   Profile,
   ecommerce,
-  calendar,
+  Countries, // add
   chat,
   mails,
   crypto,
   invoices,
   projects,
   tasks,
-  contacts,
+  contacts, 
   Dashboard,
-  DashboardSaas
+  DashboardSaas,
+  Groups, // add
+  Cities // add
 })
 
 export default rootReducer

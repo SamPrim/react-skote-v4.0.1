@@ -56,4 +56,4 @@ const calenderDefaultCategories = [
   },
 ]
 
-export { calenderDefaultCategories, events }
+// export { calenderDefaultCategories, events }

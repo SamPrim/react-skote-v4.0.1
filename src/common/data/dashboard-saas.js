@@ -124,14 +124,14 @@ const chatData = [
     }
 ];
 
-export {
-    janTopSellingData,
-    decTopSellingData,
-    novTopSellingData,
-    octTopSellingData,
-    janEarningData,
-    decEarningData,
-    novEarningData,
-    octEarningData,
-    chatData
-};
+// export {
+//     janTopSellingData,
+//     decTopSellingData,
+//     novTopSellingData,
+//     octTopSellingData,
+//     janEarningData,
+//     decEarningData,
+//     novEarningData,
+//     octEarningData,
+//     chatData
+// };
