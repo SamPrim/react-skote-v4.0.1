@@ -190,6 +190,20 @@
   "Add Countrie": "Ajouter Pays",
   "Edit Citie": "Modifier Ville",
   "Add Citie": "Ajouter Ville",
+  "Edit Local": "Modifier Locale",
+  "Add Local": "Ajouter Locale",
+  "Edit Type": "Modifier Nature",
+  "Add Type": "Ajouter Nature",
+  "Edit Category": "Modifier Categorie",
+  "Add Category": "Ajouter Categorie",
+  "Edit Delivery": "Modifier Livraison",
+  "Add Delivery": "Ajouter Livraison",
   "Create New Countrie": "Nouveau Pays",
-  "Create New Citie": "Nouvelle Ville"
+  "Create New Citie": "Nouvelle Ville",
+  "Create New Local": "Nouveau Locale",
+  "Create New Type": "Nouveau Type",
+  "Create New Category": "Nouvelle Categorie",
+  "Category": "Categorie",
+  "New Delivery": "Nouvelle Livraison",
+  "Create New Delivery": "Nouvelle Livraison"
 }

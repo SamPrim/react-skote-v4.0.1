@@ -129,9 +129,14 @@ class SidebarContent extends Component {
               <li>
                 <Link to="/#" className="has-arrow">
                   <i className="bx bx-store" />
-                  <span>{this.props.t("Products")}</span>
+                  <span>{this.props.t("Stock")}</span>
                 </Link>
                 <ul className="sub-menu" aria-expanded="false">
+                <li>
+                    <Link to="/delivery" className="">
+                      {this.props.t("New Delivery")}
+                    </Link>
+                  </li>
                   <li>
                     <Link to="/products" className="">
                       {this.props.t("New Product")}
@@ -143,7 +148,29 @@ class SidebarContent extends Component {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/category">{this.props.t("New Category")}</Link>
+                    <Link to="/categories">{this.props.t("Category")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/natures">{this.props.t("Type")}</Link>
+                  </li>
+                </ul>
+              </li>
+
+              <li>
+                <Link to="/#" className="has-arrow">
+                  <i className="bx bx-store" />
+                  <span>{this.props.t("Transfer")}</span>
+                </Link>
+                <ul className="sub-menu" aria-expanded="false">
+                  <li>
+                    <Link to="/stock">
+                      {this.props.t("New Transfer")}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/movement">
+                      {this.props.t("List")}
+                    </Link>
                   </li>
                 </ul>
               </li>
@@ -162,30 +189,6 @@ class SidebarContent extends Component {
                   <li>
                     <Link to="/list">
                       {this.props.t("Inventory")}
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-
-              <li>
-                <Link to="/#" className="has-arrow">
-                  <i className="bx bx-store" />
-                  <span>{this.props.t("Local")}</span>
-                </Link>
-                <ul className="sub-menu" aria-expanded="false">
-                  <li>
-                    <Link to="/products" className="">
-                      {this.props.t("New Local")}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/stock">
-                      {this.props.t("Stock")}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/movement">
-                      {this.props.t("Movement")}
                     </Link>
                   </li>
                 </ul>
@@ -214,6 +217,11 @@ class SidebarContent extends Component {
                   </li>
                   <li>
                     <Link to="/cities">{this.props.t("Cities")}</Link>
+                  </li>
+                  <li>
+                    <Link to="/locals" className="">
+                      {this.props.t("Local")}
+                    </Link>
                   </li>
                 </ul>
               </li>

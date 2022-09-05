@@ -19,6 +19,10 @@ import User from "../pages/Users/ContactsProfile/specific.js"
 import Groups from "../pages/Groups"
 import Countries from "pages/Countries"
 import Cities from "pages/Cities"
+import Locals from "pages/Locals"
+import Natures from "pages/Natures"
+import Categories from "pages/Categories"
+import Delivery from "pages/Delivery"
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -43,6 +47,18 @@ const authProtectedRoutes = [
 
   // cities
   { path: "/cities", component: Cities },
+
+  // Locals
+  { path: "/locals", component: Locals },
+
+  // Natures
+  { path: "/natures", component: Natures },
+
+  // Categories
+  { path: "/categories", component: Categories },
+
+  // Livraison
+  { path: "/delivery", component: Delivery },
 
   // this route should be at the end of all other routes
   // eslint-disable-next-line react/display-name

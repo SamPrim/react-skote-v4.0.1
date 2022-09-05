@@ -52,7 +52,7 @@ export const updateCountrie = (countrie, id) => put(API_URL+"/entrepot/"+id+"/co
 export const deleteCountrie = (countrie, id) =>
   del(API_URL+"/entrepot/"+id+"/countrie", { headers: { countrie } }) // add this route for delete group
 
-/////////////
+//////////////
 // get cities
 export const getCities = () => get("/entrepot/cities?skip=0&limit=100") // add this route get all cities
 // add citie
@@ -62,6 +62,56 @@ export const updateCitie = (citie, id) => put(API_URL+"/entrepot/"+id+"/citie", 
 // delete citie
 export const deleteCitie = (citie, id) =>
   del(API_URL+"/entrepot/"+id+"/citie", { headers: { citie } }) // add this route for delete citie
+
+////////////
+// get local
+export const getLocals = () => get("/entrepot/entrepot") // add this route to get all locals
+// add local
+export const addNewLocal = (local) => post(API_URL+"/entrepot/entrepot", local) // add this route to add local
+// put local
+export const updateLocal = (local, id) => put(API_URL+"/entrepot/"+id+"/entrepot", local) // add this route to update local
+// delete local
+export const deleteLocal = (local, id) => del(API_URL+"/entrepot/"+id+"/entrepot", {headers: { local }}) // add this route to delete local
+
+///////////////
+// get natures
+export const getNatures = () => get("/stock/natures") // add this route to get all natures
+// add nature
+export const addNewNature = (nature) => post(API_URL+"/stock/nature", nature) // add this route to add nature
+// put nature
+export const updateNature = (nature, id) => put(API_URL+"/stock/"+id+"/nature", nature) // add this route to update nature
+// delete nature
+export const deleteNature = (nature, id) => del(API_URL+"/stock/"+id+"/nature", {headers: { nature }}) // add this route to delete nature
+
+//////////////////
+// get categories
+export const getCategories = () => get("/stock/categories") // add this route to get all categories
+// add categorie
+export const addNewCategorie = (categorie) => post(API_URL+"/stock/categorie", categorie) // add this route to add categorie
+// put categorie
+export const updateCategorie = (categorie, id) => put(API_URL+"/stock/"+id+"/categorie", categorie) // add this route to update categorie
+// delete categorie
+export const deleteCategorie = (categorie, id) => del(API_URL+"/stock/"+id+"/categorie", {headers: { categorie }}) // add this route to delete categorie
+
+/////////////////
+// get deliverys
+export const getDeleverys = () => get("/stock/livraisons") // add this route to get all deliverys
+// add delivery
+export const addNewDelevery = (delivery) => post(API_URL+"/stock/livraison", delivery) // add this route to add delivery
+// put delivery
+export const updateDelevery = (delivery, id) => put(API_URL+"/stock/"+id+"/livraison", delivery) // add this route to update delivery
+// delete delivery
+export const deleteDelevery = (delivery, id) => del(API_URL+"/stock/"+id+"/livraison", {headers: { delivery }}) // add this route to delete delivery
+
+////////////////
+// get products
+export const getproducts = () => get("/stock/produits") // add this route to get all products
+// add product
+export const addNewProduct = (product) => post(API_URL+"/stock/produit", product) // add this route to add product
+// put product
+export const updateProduct = (product, id) => put(API_URL+"/stock/"+id+"/produit", product) // add this route to update product
+// delete product
+export const deleteProduct = (product, id) => del(API_URL+"/stock/"+id+"/produit", {headers: { product }}) // add this route to delete product
 
 //////////////////////////////////////////////////////////////
 
@@ -169,9 +219,6 @@ export const updateEvent = event => put(url.UPDATE_EVENT, event)
 // delete Event
 export const deleteEvent = event =>
   del(url.DELETE_EVENT, { headers: { event } })
-
-// get Categories
-export const getCategories = () => get(url.GET_CATEGORIES)
 
 // get chats
 export const getChats = () => get(url.GET_CHATS)

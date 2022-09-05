@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { withRouter, Link } from "react-router-dom";
+import moment from "moment";
 import {
   Card,
   CardBody,
@@ -37,24 +38,21 @@ import DeleteModal from "components/Common/DeleteModal";
 import { withTranslation } from "react-i18next";
 
 import {
-  getCategories,
-  addNewCategorie,
-  updateCategorie,
-  deleteCategorie,
-} from "store/categories/actions";
-import {
-    getNatures,
-  } from "store/natures/actions";
+  getDeleverys,
+  addNewDelevery,
+  updateDelevery,
+  deleteDelevery,
+} from "store/delevery/actions";
 
 import { isEmpty, size, map } from "lodash";
 
-class CategoriesList extends Component {
+class DeliverysList extends Component {
   constructor(props) {
     super(props);
     this.node = React.createRef();
     this.state = {
-      categories: [],
-      categorie: "",
+      deleverys: [],
+      delevery: "",
       modal: false,
       deleteModal: false,
       contactListColumns: [
@@ -62,36 +60,26 @@ class CategoriesList extends Component {
           text: "#",
           dataField: "id",
           sort: true,
-          formatter: (cellContent, categorie) => <>#{categorie.id}</>,
+          formatter: (cellContent, delevery) => <>#{delevery.id}</>,
         },
         {
-          text: "Name",
-          dataField: "name",
+          text: "Numero de Bordereau",
+          dataField: "numero_bordereau",
           sort: true,
         },
         {
-          dataField: "description",
-          text: "Description",
+          dataField: "fournisseur",
+          text: "Fournisseur",
           sort: true,
         },
         {
-            dataField: "nature.name",
-            text: "Nature",
-            sort: true,
-            formatter: (cellContent, categorie) => (
-                <>
-                    {categorie.nature ? categorie.nature.name : 'N/A'}
-                </>
-            ),
-        },
-        {
-            dataField: "parent.name",
-            text: "Parent",
-            sort: true,
-            formatter: (cellContent, categorie) => (
-                <>
-                    {categorie.parent ? categorie.parent.name : 'N/A'}
-                </>
+          dataField: "date_created",
+          text: "Created At",
+          sort: true,
+          formatter: (cellContent, delevery) => (
+              <p className="mb-1">
+                  {moment(delevery.date_created).format("DD/MM/YYYY")}
+              </p>
             ),
         },
         {
@@ -99,20 +87,20 @@ class CategoriesList extends Component {
           isDummyField: true,
           editable: false,
           text: "Action",
-          formatter: (cellContent, categorie) => (
+          formatter: (cellContent, delevery) => (
             <div className="d-flex gap-3">
               <Link className="text-success" to="#">
                 <i
                   className="mdi mdi-pencil font-size-18"
                   id="edittooltip"
-                  onClick={() => this.handleCategorieClick(categorie)}
+                  onClick={() => this.handleDeleveryClick(delevery)}
                 ></i>
               </Link>
               <Link className="text-danger" to="#">
                 <i
                   className="mdi mdi-delete font-size-18"
                   id="deletetooltip"
-                  onClick={() => this.onClickDelete(categorie)}
+                  onClick={() => this.onClickDelete(delevery)}
                 ></i>
               </Link>
             </div>
@@ -120,21 +108,20 @@ class CategoriesList extends Component {
         },
       ],
     };
-    this.handleCategorieClick = this.handleCategorieClick.bind(this);
+    this.handleDeleveryClick = this.handleDeleveryClick.bind(this);
     this.toggle = this.toggle.bind(this);
-    this.handleCategorieClicks = this.handleCategorieClicks.bind(this);
+    this.handleDeleveryClicks = this.handleDeleveryClicks.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
   }
   
 
   componentDidMount() {
-    const { categories, onGetCategories, onGetNatures } = this.props;
-    if (categories && !categories.length) {
-      onGetCategories();
-      onGetNatures();
+    const { deleverys, onGetDeleverys } = this.props;
+    if (deleverys && !deleverys.length) {
+      onGetDeleverys();
     }
-    this.setState({ categories });
-    console.log(this.state.categories);
+    this.setState({ deleverys });
+    console.log(this.state.deleverys);
   }
 
   toggle() {
@@ -143,17 +130,17 @@ class CategoriesList extends Component {
     }));
   }
 
-  handleCategorieClicks = () => {
-    this.setState({ categorie: "", isEdit: false });
+  handleDeleveryClicks = () => {
+    this.setState({ delevery: "", isEdit: false });
     this.toggle();
   };
 
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const { categories } = this.props;
-    if (!isEmpty(categories) && size(prevProps.categories) !== size(categories)) {
-      this.setState({ categories: {}, isEdit: false });
-        // this.setState({ ...this.state, categories: this.props.categoriesData });
+    const { deleverys } = this.props;
+    if (!isEmpty(deleverys) && size(prevProps.deleverys) !== size(deleverys)) {
+      this.setState({ deleverys: {}, isEdit: false });
+        // this.setState({ ...this.state, deleverys: this.props.deleverysData });
     }
   }
 
@@ -177,29 +164,28 @@ class CategoriesList extends Component {
     }));
   };
 
-  onClickDelete = categories => {
-    this.setState({ categories: categories });
+  onClickDelete = deleverys => {
+    this.setState({ deleverys: deleverys });
     this.setState({ deleteModal: true });
   };
 
-  handleDeleteCategorie = () => {
-    const { onDeleteCategorie } = this.props;
-    const { categories } = this.state;
-    if (categories.id !== undefined) {
-      onDeleteCategorie(categories, categories.id);
+  handleDeleteDelevery = () => {
+    const { onDeleteDelevery } = this.props;
+    const { deleverys } = this.state;
+    if (deleverys.id !== undefined) {
+      onDeleteDelevery(deleverys, deleverys.id);
       this.setState({ deleteModal: false });
     }
   };
 
-  handleCategorieClick = arg => {
-    const categorie = arg;
+  handleDeleveryClick = arg => {
+    const delevery = arg;
 
     this.setState({
-      categorie: {
-        id: categorie.id,
-        name: categorie.name,
-        description: categorie.description,
-        // nature_id: categorie.nature.id
+      delevery: {
+        id: delevery.id,
+        numero_bordereau: delevery.numero_bordereau,
+        fournisseur: delevery.fournisseur
       },
       isEdit: true,
     });
@@ -210,20 +196,20 @@ class CategoriesList extends Component {
   render() {
     //meta title
 
-    document.title = "Categorie | Admin";
+    document.title = "Delevery | Admin";
 
-    // const { categorie } = this.state
+    // const { groups } = this.state
     const { SearchBar } = Search;
 
-    const { categories } = this.props;
+    const { deleverys } = this.props;
 
     const { isEdit, deleteModal } = this.state;
 
-    const { onAddNewCategorie, onUpdateCategorie } = this.props;
-    const categorie = this.state.categorie;
+    const { onAddNewDelevery, onUpdateDelevery } = this.props;
+    const delevery = this.state.delevery;
     const pageOptions = {
       sizePerPage: 10,
-      totalSize: categories.length, // replace later with size(categorie),
+      totalSize: deleverys.length, // replace later with size(deleverys),
       custom: true,
     };
 
@@ -242,13 +228,13 @@ class CategoriesList extends Component {
       <React.Fragment>
         <DeleteModal
           show={deleteModal}
-          onDeleteClick={this.handleDeleteCategorie}
+          onDeleteClick={this.handleDeleteDelevery}
           onCloseClick={() => this.setState({ deleteModal: false })}
         />
         <div className="page-content">
           <Container fluid>
             {/* Render Breadcrumbs */}
-            <Breadcrumbs title="Categories" breadcrumbItem="Categories List" />
+            <Breadcrumbs title="Delevery" breadcrumbItem="Delevery List" />
             <Row>
               <Col lg="12">
                 <Card>
@@ -257,13 +243,13 @@ class CategoriesList extends Component {
                       pagination={paginationFactory(pageOptions)}
                       keyField="id"
                       columns={this.state.contactListColumns}
-                      data={categories}
+                      data={deleverys}
                     >
                       {({ paginationProps, paginationTableProps }) => (
                         <ToolkitProvider
                           keyField="id"
                           columns={this.state.contactListColumns}
-                          data={categories}
+                          data={deleverys}
                           search
                         >
                           {toolkitprops => (
@@ -284,10 +270,10 @@ class CategoriesList extends Component {
                                     <Button
                                       color="primary"
                                       className="font-16 btn-block btn btn-primary"
-                                      onClick={this.handleCategorieClicks}
+                                      onClick={this.handleDeleveryClicks}
                                     >
                                       <i className="mdi mdi-plus-circle-outline me-1" />
-                                      {this.props.t("Create New Category")}
+                                      {this.props.t("Create New Delivery")}
                                     </Button>
                                   </div>
                                 </Col>
@@ -317,52 +303,45 @@ class CategoriesList extends Component {
                                         toggle={this.toggle}
                                         tag="h4"
                                       >
-                                        {!!isEdit ? this.props.t("Edit Category") : this.props.t("Add Category")}
+                                        {!!isEdit ? this.props.t("Edit Delivery") : this.props.t("Add Delivery")}
                                       </ModalHeader>
                                       <ModalBody>
                                         <Formik
                                           enableReinitialize={true}
                                           initialValues={{
-                                            name: (categorie && categorie.name) || "",
-                                            description:
-                                              (categorie && categorie.description) || ""
+                                            numero_bordereau: (delevery && delevery.numero_bordereau) || "",
+                                            fournisseur:
+                                              (delevery && delevery.fournisseur) || ""
                                           }}
                                           validationSchema={Yup.object().shape({
-                                            name: Yup.string().required(
+                                            numero_bordereau: Yup.string().required(
+                                              this.props.t("Please Enter Number")
+                                            ),
+                                            fournisseur: Yup.string().required(
                                               this.props.t("Please Enter Name")
                                             ),
-                                            description: Yup.string().required(
-                                              this.props.t("Please Enter Description")
-                                            ),
-                                            nature_id: Yup.string().required(
-                                                this.props.t("Please Enter Country")
-                                              ),
                                           })}
                                           onSubmit={values => {
                                             if (isEdit) {
-                                              const updateCategorie = {
-                                                id: categorie.id,
-                                                name: values.name,
-                                                description: values.description,
-                                                nature_id: values.nature_id,
-                                                parent_id: values.parent_id
+                                              const updateDelevery = {
+                                                id: delevery.id,
+                                                numero_bordereau: values.numero_bordereau,
+                                                fournisseur: values.fournisseur
                                               };
 
-                                              // update categorie
-                                              onUpdateCategorie(updateCategorie);
+                                              // update delevery
+                                              onUpdateDelevery(updateDelevery);
                                             } else {
-                                              const newCategorie = {
-                                                name: values["name"],
-                                                description:
-                                                  values["description"],
-                                                nature_id: values["nature_id"],
-                                                parent_id: values["parent_id"]
+                                              const newDelevery = {
+                                                numero_bordereau: values["numero_bordereau"],
+                                                fournisseur:
+                                                  values["fournisseur"],
                                               };
-                                              // save new Citie
-                                              onAddNewCategorie(newCategorie);
+                                              // save new delevery
+                                              onAddNewDelevery(newDelevery);
                                             }
                                             this.setState({
-                                              selectedCategorie: null,
+                                              selectedDelivery: null,
                                             });
                                             this.toggle();
                                           }}
@@ -373,10 +352,10 @@ class CategoriesList extends Component {
                                                 <Col className="col-12">
                                                   <div className="mb-3">
                                                     <Label className="form-label">
-                                                      Name
+                                                      Numero De Bordereau
                                                     </Label>
                                                     <Field
-                                                      name="name"
+                                                      name="numero_bordereau"
                                                       type="text"
                                                       className={
                                                         "form-control" +
@@ -387,76 +366,28 @@ class CategoriesList extends Component {
                                                       }
                                                     />
                                                     <ErrorMessage
-                                                      name="name"
+                                                      name="numero_bordereau"
                                                       component="div"
                                                       className="invalid-feedback"
                                                     />
                                                   </div>
                                                   <div className="mb-3">
                                                     <Label className="form-label">
-                                                      Nature
+                                                      Fournisseur
                                                     </Label>
                                                     <Field
-                                                      name="nature_id"
-                                                      as="select"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.categorie &&
-                                                        touched.categorie
-                                                          ? " is-invalid"
-                                                          : "")
-                                                      }
-                                                      multiple={false}
-                                                    >
-                                                      <option>---</option>
-                                                      {
-                                                        this.props.natures.map((nature) => (
-                                                          <option key={nature.id} value={nature.id}>{nature.name}</option>
-                                                        ))
-                                                      }
-                                                    </Field>
-                                                  </div>
-                                                  <div className="mb-3">
-                                                    <Label className="form-label">
-                                                      Ratache to
-                                                    </Label>
-                                                    <Field
-                                                      name="parent_id"
-                                                      as="select"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.parent_id &&
-                                                        touched.parent_id
-                                                          ? " is-invalid"
-                                                          : "")
-                                                      }
-                                                      multiple={false}
-                                                    >
-                                                      <option>---</option>
-                                                      {
-                                                        this.props.categories.map((categorie) => (
-                                                          <option key={categorie.id} value={categorie.id}>{categorie.name}</option>
-                                                        ))
-                                                      }
-                                                    </Field>
-                                                  </div>
-                                                  <div className="mb-3">
-                                                    <Label className="form-label">
-                                                      Description
-                                                    </Label>
-                                                    <Field
-                                                      name="description"
+                                                      name="fournisseur"
                                                       type="textarea"
                                                       className={
                                                         "form-control" +
-                                                        (errors.description &&
-                                                        touched.description
+                                                        (errors.fournisseur &&
+                                                        touched.fournisseur
                                                           ? " is-invalid"
                                                           : "")
                                                       }
                                                     />
                                                     <ErrorMessage
-                                                      name="description"
+                                                      name="fournisseur"
                                                       component="div"
                                                       className="invalid-feedback"
                                                     />
@@ -506,32 +437,28 @@ class CategoriesList extends Component {
   }
 }
 
-CategoriesList.propTypes = {
-  categories: PropTypes.array,
-  natures: PropTypes.array,
+DeliverysList.propTypes = {
+  deleverys: PropTypes.array,
   className: PropTypes.any,
-  onGetCategories: PropTypes.func,
-  onAddNewCategorie: PropTypes.func,
-  onDeleteCategorie: PropTypes.func,
-  onUpdateCategorie: PropTypes.func,
-  onGetNatures: PropTypes.func,
+  onGetDeleverys: PropTypes.func,
+  onAddNewDelevery: PropTypes.func,
+  onDeleteDelevery: PropTypes.func,
+  onUpdateDelevery: PropTypes.func,
   t: PropTypes.func,
 };
 
-const mapStateToProps = ({ Natures, Categories }) => ({
-  natures: Natures.natures,
-  categories: Categories.categories
+const mapStateToProps = ({ Deleverys }) => ({
+  deleverys: Deleverys.deleverys,
 });
 
 const mapDispatchToProps = dispatch => ({
-  onGetCategories: () => dispatch(getCategories()),
-  onAddNewCategorie: categorie => dispatch(addNewCategorie(categorie)),
-  onUpdateCategorie: categorie => dispatch(updateCategorie(categorie)),
-  onDeleteCategorie: categorie => dispatch(deleteCategorie(categorie)),
-  onGetNatures: () => dispatch(getNatures()),
+  onGetDeleverys: () => dispatch(getDeleverys()),
+  onAddNewDelevery: delevery => dispatch(addNewDelevery(delevery)),
+  onUpdateDelevery: delevery => dispatch(updateDelevery(delevery)),
+  onDeleteDelevery: delevery => dispatch(deleteDelevery(delevery)),
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(withTranslation()(CategoriesList)));
+)(withRouter(withTranslation()(DeliverysList)));

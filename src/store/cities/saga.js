@@ -53,7 +53,7 @@ function* onUpdateCitie({ payload: citie }) {
   try {
     const response = yield call(updateCitie, citie, citie.id)
     yield fetchCities()
-    yield put(updateCitieSuccess(response))
+    // yield put(updateCitieSuccess(response))
   } catch (error) {
     yield put(updateCitieFail(error))
   }

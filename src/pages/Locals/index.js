@@ -37,24 +37,25 @@ import DeleteModal from "components/Common/DeleteModal";
 import { withTranslation } from "react-i18next";
 
 import {
-  getCategories,
-  addNewCategorie,
-  updateCategorie,
-  deleteCategorie,
-} from "store/categories/actions";
+  getLocals,
+  addNewLocal,
+  updateLocal,
+  deleteLocal,
+} from "store/local/actions";
 import {
-    getNatures,
-  } from "store/natures/actions";
+    getCities,
+  } from "store/cities/actions";
 
 import { isEmpty, size, map } from "lodash";
+import moment from "moment";
 
-class CategoriesList extends Component {
+class LocalsList extends Component {
   constructor(props) {
     super(props);
     this.node = React.createRef();
     this.state = {
-      categories: [],
-      categorie: "",
+      locals: [],
+      local: "",
       modal: false,
       deleteModal: false,
       contactListColumns: [
@@ -62,7 +63,7 @@ class CategoriesList extends Component {
           text: "#",
           dataField: "id",
           sort: true,
-          formatter: (cellContent, categorie) => <>#{categorie.id}</>,
+          formatter: (cellContent, local) => <>#{local.id}</>,
         },
         {
           text: "Name",
@@ -75,44 +76,49 @@ class CategoriesList extends Component {
           sort: true,
         },
         {
-            dataField: "nature.name",
-            text: "Nature",
+            dataField: "citie.name",
+            text: "Citie",
             sort: true,
-            formatter: (cellContent, categorie) => (
-                <>
-                    {categorie.nature ? categorie.nature.name : 'N/A'}
-                </>
-            ),
         },
         {
-            dataField: "parent.name",
-            text: "Parent",
+            dataField: "date_created",
+            text: "Created At",
             sort: true,
-            formatter: (cellContent, categorie) => (
-                <>
-                    {categorie.parent ? categorie.parent.name : 'N/A'}
-                </>
-            ),
+            formatter: (cellContent, local) => (
+                <p className="mb-1">
+                    {moment(local.date_created).format("DD/MM/YYYY")}
+                </p>
+              ),
+        },
+        {
+            dataField: "date_updated",
+            text: "Updated At",
+            sort: true,
+            formatter: (cellContent, local) => (
+                <p className="mb-1">
+                    {moment(local.date_updated).format("DD/MM/YYYY")}
+                </p>
+              ),
         },
         {
           dataField: "menu",
           isDummyField: true,
           editable: false,
           text: "Action",
-          formatter: (cellContent, categorie) => (
+          formatter: (cellContent, local) => (
             <div className="d-flex gap-3">
               <Link className="text-success" to="#">
                 <i
                   className="mdi mdi-pencil font-size-18"
                   id="edittooltip"
-                  onClick={() => this.handleCategorieClick(categorie)}
+                  onClick={() => this.handleLocalClick(local)}
                 ></i>
               </Link>
               <Link className="text-danger" to="#">
                 <i
                   className="mdi mdi-delete font-size-18"
                   id="deletetooltip"
-                  onClick={() => this.onClickDelete(categorie)}
+                  onClick={() => this.onClickDelete(local)}
                 ></i>
               </Link>
             </div>
@@ -120,21 +126,21 @@ class CategoriesList extends Component {
         },
       ],
     };
-    this.handleCategorieClick = this.handleCategorieClick.bind(this);
+    this.handleLocalClick = this.handleLocalClick.bind(this);
     this.toggle = this.toggle.bind(this);
-    this.handleCategorieClicks = this.handleCategorieClicks.bind(this);
+    this.handleLocalClicks = this.handleLocalClicks.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
   }
   
 
   componentDidMount() {
-    const { categories, onGetCategories, onGetNatures } = this.props;
-    if (categories && !categories.length) {
-      onGetCategories();
-      onGetNatures();
+    const { locals, onGetLocals, onGetCities } = this.props;
+    if (locals && !locals.length) {
+      onGetCities();
+      onGetLocals();
     }
-    this.setState({ categories });
-    console.log(this.state.categories);
+    this.setState({ locals });
+    console.log(this.state.locals);
   }
 
   toggle() {
@@ -143,17 +149,17 @@ class CategoriesList extends Component {
     }));
   }
 
-  handleCategorieClicks = () => {
-    this.setState({ categorie: "", isEdit: false });
+  handleLocalClicks = () => {
+    this.setState({ local: "", isEdit: false });
     this.toggle();
   };
 
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const { categories } = this.props;
-    if (!isEmpty(categories) && size(prevProps.categories) !== size(categories)) {
-      this.setState({ categories: {}, isEdit: false });
-        // this.setState({ ...this.state, categories: this.props.categoriesData });
+    const { locals } = this.props;
+    if (!isEmpty(locals) && size(prevProps.locals) !== size(locals)) {
+      this.setState({ locals: {}, isEdit: false });
+        // this.setState({ ...this.state, locals: this.props.localsData });
     }
   }
 
@@ -177,29 +183,29 @@ class CategoriesList extends Component {
     }));
   };
 
-  onClickDelete = categories => {
-    this.setState({ categories: categories });
+  onClickDelete = locals => {
+    this.setState({ locals: locals });
     this.setState({ deleteModal: true });
   };
 
-  handleDeleteCategorie = () => {
-    const { onDeleteCategorie } = this.props;
-    const { categories } = this.state;
-    if (categories.id !== undefined) {
-      onDeleteCategorie(categories, categories.id);
+  handleDeleteLocal = () => {
+    const { onDeleteLocal } = this.props;
+    const { locals } = this.state;
+    if (locals.id !== undefined) {
+      onDeleteLocal(locals, locals.id);
       this.setState({ deleteModal: false });
     }
   };
 
-  handleCategorieClick = arg => {
-    const categorie = arg;
+  handleLocalClick = arg => {
+    const local = arg;
 
     this.setState({
-      categorie: {
-        id: categorie.id,
-        name: categorie.name,
-        description: categorie.description,
-        // nature_id: categorie.nature.id
+      local: {
+        id: local.id,
+        name: local.name,
+        description: local.description,
+        citie_id: local.citie.id
       },
       isEdit: true,
     });
@@ -210,20 +216,20 @@ class CategoriesList extends Component {
   render() {
     //meta title
 
-    document.title = "Categorie | Admin";
+    document.title = "Local | Admin";
 
-    // const { categorie } = this.state
+    // const { local } = this.state
     const { SearchBar } = Search;
 
-    const { categories } = this.props;
+    const { locals } = this.props;
 
     const { isEdit, deleteModal } = this.state;
 
-    const { onAddNewCategorie, onUpdateCategorie } = this.props;
-    const categorie = this.state.categorie;
+    const { onAddNewLocal, onUpdateLocal } = this.props;
+    const local = this.state.local;
     const pageOptions = {
       sizePerPage: 10,
-      totalSize: categories.length, // replace later with size(categorie),
+      totalSize: locals.length, // replace later with size(local),
       custom: true,
     };
 
@@ -242,13 +248,13 @@ class CategoriesList extends Component {
       <React.Fragment>
         <DeleteModal
           show={deleteModal}
-          onDeleteClick={this.handleDeleteCategorie}
+          onDeleteClick={this.handleDeleteLocal}
           onCloseClick={() => this.setState({ deleteModal: false })}
         />
         <div className="page-content">
           <Container fluid>
             {/* Render Breadcrumbs */}
-            <Breadcrumbs title="Categories" breadcrumbItem="Categories List" />
+            <Breadcrumbs title="Locals" breadcrumbItem="Locals List" />
             <Row>
               <Col lg="12">
                 <Card>
@@ -257,13 +263,13 @@ class CategoriesList extends Component {
                       pagination={paginationFactory(pageOptions)}
                       keyField="id"
                       columns={this.state.contactListColumns}
-                      data={categories}
+                      data={locals}
                     >
                       {({ paginationProps, paginationTableProps }) => (
                         <ToolkitProvider
                           keyField="id"
                           columns={this.state.contactListColumns}
-                          data={categories}
+                          data={locals}
                           search
                         >
                           {toolkitprops => (
@@ -284,10 +290,10 @@ class CategoriesList extends Component {
                                     <Button
                                       color="primary"
                                       className="font-16 btn-block btn btn-primary"
-                                      onClick={this.handleCategorieClicks}
+                                      onClick={this.handleLocalClicks}
                                     >
                                       <i className="mdi mdi-plus-circle-outline me-1" />
-                                      {this.props.t("Create New Category")}
+                                      {this.props.t("Create New Local")}
                                     </Button>
                                   </div>
                                 </Col>
@@ -317,15 +323,15 @@ class CategoriesList extends Component {
                                         toggle={this.toggle}
                                         tag="h4"
                                       >
-                                        {!!isEdit ? this.props.t("Edit Category") : this.props.t("Add Category")}
+                                        {!!isEdit ? this.props.t("Edit Local") : this.props.t("Add Local")}
                                       </ModalHeader>
                                       <ModalBody>
                                         <Formik
                                           enableReinitialize={true}
                                           initialValues={{
-                                            name: (categorie && categorie.name) || "",
+                                            name: (local && local.name) || "",
                                             description:
-                                              (categorie && categorie.description) || ""
+                                              (local && local.description) || ""
                                           }}
                                           validationSchema={Yup.object().shape({
                                             name: Yup.string().required(
@@ -334,35 +340,33 @@ class CategoriesList extends Component {
                                             description: Yup.string().required(
                                               this.props.t("Please Enter Description")
                                             ),
-                                            nature_id: Yup.string().required(
-                                                this.props.t("Please Enter Country")
+                                            citie_id: Yup.string().required(
+                                                this.props.t("Please Enter citie")
                                               ),
                                           })}
                                           onSubmit={values => {
                                             if (isEdit) {
-                                              const updateCategorie = {
-                                                id: categorie.id,
+                                              const updateLocal = {
+                                                id: local.id,
                                                 name: values.name,
                                                 description: values.description,
-                                                nature_id: values.nature_id,
-                                                parent_id: values.parent_id
+                                                citie_id: (values.citie_id ? values.citie_id : local.citie.citie_id),
                                               };
 
-                                              // update categorie
-                                              onUpdateCategorie(updateCategorie);
+                                              // update local
+                                              onUpdateLocal(updateLocal);
                                             } else {
-                                              const newCategorie = {
+                                              const newLocal = {
                                                 name: values["name"],
                                                 description:
                                                   values["description"],
-                                                nature_id: values["nature_id"],
-                                                parent_id: values["parent_id"]
+                                                  citie_id: values["citie_id"]
                                               };
                                               // save new Citie
-                                              onAddNewCategorie(newCategorie);
+                                              onAddNewLocal(newLocal);
                                             }
                                             this.setState({
-                                              selectedCategorie: null,
+                                              selectedCitie: null,
                                             });
                                             this.toggle();
                                           }}
@@ -394,15 +398,15 @@ class CategoriesList extends Component {
                                                   </div>
                                                   <div className="mb-3">
                                                     <Label className="form-label">
-                                                      Nature
+                                                      Citie
                                                     </Label>
                                                     <Field
-                                                      name="nature_id"
+                                                      name="citie_id"
                                                       as="select"
                                                       className={
                                                         "form-control" +
-                                                        (errors.categorie &&
-                                                        touched.categorie
+                                                        (errors.citie_id &&
+                                                        touched.citie_id
                                                           ? " is-invalid"
                                                           : "")
                                                       }
@@ -410,35 +414,16 @@ class CategoriesList extends Component {
                                                     >
                                                       <option>---</option>
                                                       {
-                                                        this.props.natures.map((nature) => (
-                                                          <option key={nature.id} value={nature.id}>{nature.name}</option>
+                                                        this.props.cities.map((citie) => (
+                                                          <option key={citie.id} value={citie.id}>{citie.name}</option>
                                                         ))
                                                       }
                                                     </Field>
-                                                  </div>
-                                                  <div className="mb-3">
-                                                    <Label className="form-label">
-                                                      Ratache to
-                                                    </Label>
-                                                    <Field
-                                                      name="parent_id"
-                                                      as="select"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.parent_id &&
-                                                        touched.parent_id
-                                                          ? " is-invalid"
-                                                          : "")
-                                                      }
-                                                      multiple={false}
-                                                    >
-                                                      <option>---</option>
-                                                      {
-                                                        this.props.categories.map((categorie) => (
-                                                          <option key={categorie.id} value={categorie.id}>{categorie.name}</option>
-                                                        ))
-                                                      }
-                                                    </Field>
+                                                    <ErrorMessage
+                                                      name="citie_id"
+                                                      component="div"
+                                                      className="invalid-feedback"
+                                                    />
                                                   </div>
                                                   <div className="mb-3">
                                                     <Label className="form-label">
@@ -506,32 +491,32 @@ class CategoriesList extends Component {
   }
 }
 
-CategoriesList.propTypes = {
-  categories: PropTypes.array,
-  natures: PropTypes.array,
+LocalsList.propTypes = {
+  cities: PropTypes.array,
+  locals: PropTypes.array,
   className: PropTypes.any,
-  onGetCategories: PropTypes.func,
-  onAddNewCategorie: PropTypes.func,
-  onDeleteCategorie: PropTypes.func,
-  onUpdateCategorie: PropTypes.func,
-  onGetNatures: PropTypes.func,
+  onGetLocals: PropTypes.func,
+  onAddNewLocal: PropTypes.func,
+  onDeleteLocal: PropTypes.func,
+  onUpdateLocal: PropTypes.func,
+  onGetCities: PropTypes.func,
   t: PropTypes.func,
 };
 
-const mapStateToProps = ({ Natures, Categories }) => ({
-  natures: Natures.natures,
-  categories: Categories.categories
+const mapStateToProps = ({ Cities, Locals }) => ({
+  cities: Cities.cities,
+  locals: Locals.locals
 });
 
 const mapDispatchToProps = dispatch => ({
-  onGetCategories: () => dispatch(getCategories()),
-  onAddNewCategorie: categorie => dispatch(addNewCategorie(categorie)),
-  onUpdateCategorie: categorie => dispatch(updateCategorie(categorie)),
-  onDeleteCategorie: categorie => dispatch(deleteCategorie(categorie)),
-  onGetNatures: () => dispatch(getNatures()),
+  onGetLocals: () => dispatch(getLocals()),
+  onAddNewLocal: local => dispatch(addNewLocal(local)),
+  onUpdateLocal: local => dispatch(updateLocal(local)),
+  onDeleteLocal: local => dispatch(deleteLocal(local)),
+  onGetCities: () => dispatch(getCities()),
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(withTranslation()(CategoriesList)));
+)(withRouter(withTranslation()(LocalsList)));

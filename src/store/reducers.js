@@ -45,8 +45,20 @@ import DashboardSaas from "./dashboard-saas/reducer";
 //Groups
 import Groups from "./groups/reducer";
 
+// Locals
+import Locals from "./local/reducer";
+
 // Cities
-import Cities from "./cities/reducer"
+import Cities from "./cities/reducer";
+
+// Natures
+import Natures from "./natures/reducer";
+
+// Categories
+import Categories from "./categories/reducer";
+
+// Delevery
+import Deleverys from "./delevery/reducer"
 
 const rootReducer = combineReducers({
   // public
@@ -67,7 +79,11 @@ const rootReducer = combineReducers({
   Dashboard,
   DashboardSaas,
   Groups, // add
-  Cities // add
+  Cities, // add
+  Locals, // add
+  Natures, // add
+  Categories, // add
+  Deleverys, // add
 })
 
 export default rootReducer

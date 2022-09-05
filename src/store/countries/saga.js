@@ -57,7 +57,7 @@ function* onUpdateCountrie({ payload: countrie }) {
   try {
     const response = yield call(updateCountrie, countrie, countrie.id)
     yield fetchCountries()
-    yield put(updateCountrieSuccess(response))
+    // yield put(updateCountrieSuccess(response))
   } catch (error) {
     yield put(updateCountrieFail(error))
   }

@@ -37,24 +37,21 @@ import DeleteModal from "components/Common/DeleteModal";
 import { withTranslation } from "react-i18next";
 
 import {
-  getCategories,
-  addNewCategorie,
-  updateCategorie,
-  deleteCategorie,
-} from "store/categories/actions";
-import {
-    getNatures,
-  } from "store/natures/actions";
+  getNatures,
+  addNewNature,
+  updateNature,
+  deleteNature,
+} from "store/natures/actions";
 
 import { isEmpty, size, map } from "lodash";
 
-class CategoriesList extends Component {
+class NaturesList extends Component {
   constructor(props) {
     super(props);
     this.node = React.createRef();
     this.state = {
-      categories: [],
-      categorie: "",
+      natures: [],
+      nature: "",
       modal: false,
       deleteModal: false,
       contactListColumns: [
@@ -62,7 +59,7 @@ class CategoriesList extends Component {
           text: "#",
           dataField: "id",
           sort: true,
-          formatter: (cellContent, categorie) => <>#{categorie.id}</>,
+          formatter: (cellContent, nature) => <>#{nature.id}</>,
         },
         {
           text: "Name",
@@ -75,44 +72,24 @@ class CategoriesList extends Component {
           sort: true,
         },
         {
-            dataField: "nature.name",
-            text: "Nature",
-            sort: true,
-            formatter: (cellContent, categorie) => (
-                <>
-                    {categorie.nature ? categorie.nature.name : 'N/A'}
-                </>
-            ),
-        },
-        {
-            dataField: "parent.name",
-            text: "Parent",
-            sort: true,
-            formatter: (cellContent, categorie) => (
-                <>
-                    {categorie.parent ? categorie.parent.name : 'N/A'}
-                </>
-            ),
-        },
-        {
           dataField: "menu",
           isDummyField: true,
           editable: false,
           text: "Action",
-          formatter: (cellContent, categorie) => (
+          formatter: (cellContent, nature) => (
             <div className="d-flex gap-3">
               <Link className="text-success" to="#">
                 <i
                   className="mdi mdi-pencil font-size-18"
                   id="edittooltip"
-                  onClick={() => this.handleCategorieClick(categorie)}
+                  onClick={() => this.handleNatureClick(nature)}
                 ></i>
               </Link>
               <Link className="text-danger" to="#">
                 <i
                   className="mdi mdi-delete font-size-18"
                   id="deletetooltip"
-                  onClick={() => this.onClickDelete(categorie)}
+                  onClick={() => this.onClickDelete(nature)}
                 ></i>
               </Link>
             </div>
@@ -120,21 +97,20 @@ class CategoriesList extends Component {
         },
       ],
     };
-    this.handleCategorieClick = this.handleCategorieClick.bind(this);
+    this.handleNatureClick = this.handleNatureClick.bind(this);
     this.toggle = this.toggle.bind(this);
-    this.handleCategorieClicks = this.handleCategorieClicks.bind(this);
+    this.handleNatureClicks = this.handleNatureClicks.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
   }
   
 
   componentDidMount() {
-    const { categories, onGetCategories, onGetNatures } = this.props;
-    if (categories && !categories.length) {
-      onGetCategories();
+    const { natures, onGetNatures } = this.props;
+    if (natures && !natures.length) {
       onGetNatures();
     }
-    this.setState({ categories });
-    console.log(this.state.categories);
+    this.setState({ natures });
+    console.log(this.state.natures);
   }
 
   toggle() {
@@ -143,17 +119,17 @@ class CategoriesList extends Component {
     }));
   }
 
-  handleCategorieClicks = () => {
-    this.setState({ categorie: "", isEdit: false });
+  handleNatureClicks = () => {
+    this.setState({ nature: "", isEdit: false });
     this.toggle();
   };
 
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const { categories } = this.props;
-    if (!isEmpty(categories) && size(prevProps.categories) !== size(categories)) {
-      this.setState({ categories: {}, isEdit: false });
-        // this.setState({ ...this.state, categories: this.props.categoriesData });
+    const { natures } = this.props;
+    if (!isEmpty(natures) && size(prevProps.natures) !== size(natures)) {
+      this.setState({ natures: {}, isEdit: false });
+        // this.setState({ ...this.state, groups: this.props.groupsData });
     }
   }
 
@@ -177,29 +153,28 @@ class CategoriesList extends Component {
     }));
   };
 
-  onClickDelete = categories => {
-    this.setState({ categories: categories });
+  onClickDelete = natures => {
+    this.setState({ natures: natures });
     this.setState({ deleteModal: true });
   };
 
-  handleDeleteCategorie = () => {
-    const { onDeleteCategorie } = this.props;
-    const { categories } = this.state;
-    if (categories.id !== undefined) {
-      onDeleteCategorie(categories, categories.id);
+  handleDeleteNature = () => {
+    const { onDeleteNature } = this.props;
+    const { natures } = this.state;
+    if (natures.id !== undefined) {
+      onDeleteNature(natures, natures.id);
       this.setState({ deleteModal: false });
     }
   };
 
-  handleCategorieClick = arg => {
-    const categorie = arg;
+  handleNatureClick = arg => {
+    const nature = arg;
 
     this.setState({
-      categorie: {
-        id: categorie.id,
-        name: categorie.name,
-        description: categorie.description,
-        // nature_id: categorie.nature.id
+      nature: {
+        id: nature.id,
+        name: nature.name,
+        description: nature.description
       },
       isEdit: true,
     });
@@ -210,20 +185,20 @@ class CategoriesList extends Component {
   render() {
     //meta title
 
-    document.title = "Categorie | Admin";
+    document.title = "Nature | Admin";
 
-    // const { categorie } = this.state
+    // const { natures } = this.state
     const { SearchBar } = Search;
 
-    const { categories } = this.props;
+    const { natures } = this.props;
 
     const { isEdit, deleteModal } = this.state;
 
-    const { onAddNewCategorie, onUpdateCategorie } = this.props;
-    const categorie = this.state.categorie;
+    const { onAddNewNature, onUpdateNature } = this.props;
+    const nature = this.state.nature;
     const pageOptions = {
       sizePerPage: 10,
-      totalSize: categories.length, // replace later with size(categorie),
+      totalSize: natures.length, // replace later with size(natures),
       custom: true,
     };
 
@@ -242,13 +217,13 @@ class CategoriesList extends Component {
       <React.Fragment>
         <DeleteModal
           show={deleteModal}
-          onDeleteClick={this.handleDeleteCategorie}
+          onDeleteClick={this.handleDeleteNature}
           onCloseClick={() => this.setState({ deleteModal: false })}
         />
         <div className="page-content">
           <Container fluid>
             {/* Render Breadcrumbs */}
-            <Breadcrumbs title="Categories" breadcrumbItem="Categories List" />
+            <Breadcrumbs title="Natures" breadcrumbItem="Natures List" />
             <Row>
               <Col lg="12">
                 <Card>
@@ -257,13 +232,13 @@ class CategoriesList extends Component {
                       pagination={paginationFactory(pageOptions)}
                       keyField="id"
                       columns={this.state.contactListColumns}
-                      data={categories}
+                      data={natures}
                     >
                       {({ paginationProps, paginationTableProps }) => (
                         <ToolkitProvider
                           keyField="id"
                           columns={this.state.contactListColumns}
-                          data={categories}
+                          data={natures}
                           search
                         >
                           {toolkitprops => (
@@ -284,10 +259,10 @@ class CategoriesList extends Component {
                                     <Button
                                       color="primary"
                                       className="font-16 btn-block btn btn-primary"
-                                      onClick={this.handleCategorieClicks}
+                                      onClick={this.handleNatureClicks}
                                     >
                                       <i className="mdi mdi-plus-circle-outline me-1" />
-                                      {this.props.t("Create New Category")}
+                                      {this.props.t("Create New Type")}
                                     </Button>
                                   </div>
                                 </Col>
@@ -317,15 +292,15 @@ class CategoriesList extends Component {
                                         toggle={this.toggle}
                                         tag="h4"
                                       >
-                                        {!!isEdit ? this.props.t("Edit Category") : this.props.t("Add Category")}
+                                        {!!isEdit ? this.props.t("Edit Type") : this.props.t("Add Type")}
                                       </ModalHeader>
                                       <ModalBody>
                                         <Formik
                                           enableReinitialize={true}
                                           initialValues={{
-                                            name: (categorie && categorie.name) || "",
+                                            name: (nature && nature.name) || "",
                                             description:
-                                              (categorie && categorie.description) || ""
+                                              (nature && nature.description) || ""
                                           }}
                                           validationSchema={Yup.object().shape({
                                             name: Yup.string().required(
@@ -334,35 +309,28 @@ class CategoriesList extends Component {
                                             description: Yup.string().required(
                                               this.props.t("Please Enter Description")
                                             ),
-                                            nature_id: Yup.string().required(
-                                                this.props.t("Please Enter Country")
-                                              ),
                                           })}
                                           onSubmit={values => {
                                             if (isEdit) {
-                                              const updateCategorie = {
-                                                id: categorie.id,
+                                              const updateNature = {
+                                                id: nature.id,
                                                 name: values.name,
-                                                description: values.description,
-                                                nature_id: values.nature_id,
-                                                parent_id: values.parent_id
+                                                description: values.description
                                               };
 
-                                              // update categorie
-                                              onUpdateCategorie(updateCategorie);
+                                              // update nature
+                                              onUpdateNature(updateNature);
                                             } else {
-                                              const newCategorie = {
+                                              const newNature = {
                                                 name: values["name"],
                                                 description:
                                                   values["description"],
-                                                nature_id: values["nature_id"],
-                                                parent_id: values["parent_id"]
                                               };
-                                              // save new Citie
-                                              onAddNewCategorie(newCategorie);
+                                              // save new group
+                                              onAddNewNature(newNature);
                                             }
                                             this.setState({
-                                              selectedCategorie: null,
+                                              selectedNature: null,
                                             });
                                             this.toggle();
                                           }}
@@ -391,54 +359,6 @@ class CategoriesList extends Component {
                                                       component="div"
                                                       className="invalid-feedback"
                                                     />
-                                                  </div>
-                                                  <div className="mb-3">
-                                                    <Label className="form-label">
-                                                      Nature
-                                                    </Label>
-                                                    <Field
-                                                      name="nature_id"
-                                                      as="select"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.categorie &&
-                                                        touched.categorie
-                                                          ? " is-invalid"
-                                                          : "")
-                                                      }
-                                                      multiple={false}
-                                                    >
-                                                      <option>---</option>
-                                                      {
-                                                        this.props.natures.map((nature) => (
-                                                          <option key={nature.id} value={nature.id}>{nature.name}</option>
-                                                        ))
-                                                      }
-                                                    </Field>
-                                                  </div>
-                                                  <div className="mb-3">
-                                                    <Label className="form-label">
-                                                      Ratache to
-                                                    </Label>
-                                                    <Field
-                                                      name="parent_id"
-                                                      as="select"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.parent_id &&
-                                                        touched.parent_id
-                                                          ? " is-invalid"
-                                                          : "")
-                                                      }
-                                                      multiple={false}
-                                                    >
-                                                      <option>---</option>
-                                                      {
-                                                        this.props.categories.map((categorie) => (
-                                                          <option key={categorie.id} value={categorie.id}>{categorie.name}</option>
-                                                        ))
-                                                      }
-                                                    </Field>
                                                   </div>
                                                   <div className="mb-3">
                                                     <Label className="form-label">
@@ -506,32 +426,28 @@ class CategoriesList extends Component {
   }
 }
 
-CategoriesList.propTypes = {
-  categories: PropTypes.array,
+NaturesList.propTypes = {
   natures: PropTypes.array,
   className: PropTypes.any,
-  onGetCategories: PropTypes.func,
-  onAddNewCategorie: PropTypes.func,
-  onDeleteCategorie: PropTypes.func,
-  onUpdateCategorie: PropTypes.func,
   onGetNatures: PropTypes.func,
+  onAddNewNature: PropTypes.func,
+  onDeleteNature: PropTypes.func,
+  onUpdateNature: PropTypes.func,
   t: PropTypes.func,
 };
 
-const mapStateToProps = ({ Natures, Categories }) => ({
+const mapStateToProps = ({ Natures }) => ({
   natures: Natures.natures,
-  categories: Categories.categories
 });
 
 const mapDispatchToProps = dispatch => ({
-  onGetCategories: () => dispatch(getCategories()),
-  onAddNewCategorie: categorie => dispatch(addNewCategorie(categorie)),
-  onUpdateCategorie: categorie => dispatch(updateCategorie(categorie)),
-  onDeleteCategorie: categorie => dispatch(deleteCategorie(categorie)),
   onGetNatures: () => dispatch(getNatures()),
+  onAddNewNature: nature => dispatch(addNewNature(nature)),
+  onUpdateNature: nature => dispatch(updateNature(nature)),
+  onDeleteNature: nature => dispatch(deleteNature(nature)),
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(withTranslation()(CategoriesList)));
+)(withRouter(withTranslation()(NaturesList)));
