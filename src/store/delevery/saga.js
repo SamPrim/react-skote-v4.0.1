@@ -48,8 +48,17 @@ function* onAddNewDelevery({ payload: delevery }) {
 
 function* onUpdateDelevery({ payload: delevery }) {
   try {
-    const response = yield call(updateDelevery, delevery, delevery.id)
+    // const response = yield call(updateDelevery, delevery, delevery.get("id"))
+    yield axios({
+      method: "put",
+      url:"http://localhost:8000/stock/4/livraison",
+      data: delevery,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
     yield fetchDeleverys()
+    
     // yield put(updateDeleverySuccess(response))
   } catch (error) {
     yield put(updateDeleveryFail(error))

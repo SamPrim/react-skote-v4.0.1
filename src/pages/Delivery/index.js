@@ -14,6 +14,7 @@ import {
   ModalHeader,
   ModalBody,
   Label,
+  Input
 } from "reactstrap";
 import paginationFactory, {
   PaginationProvider,
@@ -79,6 +80,15 @@ class DeliverysList extends Component {
           formatter: (cellContent, delevery) => (
               <p className="mb-1">
                   {moment(delevery.date_created).format("DD/MM/YYYY")}
+              </p>
+            ),
+        },
+        {
+          text: "Document",
+          sort: true,
+          formatter: (cellContent, delevery) => (
+              <p className="mb-1">
+                  {delevery.numero_bordereau+"-"+delevery.fournisseur+".png"}
               </p>
             ),
         },
@@ -234,7 +244,7 @@ class DeliverysList extends Component {
         <div className="page-content">
           <Container fluid>
             {/* Render Breadcrumbs */}
-            <Breadcrumbs title="Delevery" breadcrumbItem="Delevery List" />
+            <Breadcrumbs title="Delivery" breadcrumbItem="Delivery List" />
             <Row>
               <Col lg="12">
                 <Card>
@@ -311,7 +321,8 @@ class DeliverysList extends Component {
                                           initialValues={{
                                             numero_bordereau: (delevery && delevery.numero_bordereau) || "",
                                             fournisseur:
-                                              (delevery && delevery.fournisseur) || ""
+                                              (delevery && delevery.fournisseur) || "",
+                                            photo: null
                                           }}
                                           validationSchema={Yup.object().shape({
                                             numero_bordereau: Yup.string().required(
@@ -322,21 +333,28 @@ class DeliverysList extends Component {
                                             ),
                                           })}
                                           onSubmit={values => {
+                                            console.log(values);
                                             if (isEdit) {
-                                              const updateDelevery = {
-                                                id: delevery.id,
-                                                numero_bordereau: values.numero_bordereau,
-                                                fournisseur: values.fournisseur
-                                              };
+                                                let updateDelevery = new FormData();
+                                                updateDelevery.append("id", delevery.id),
+                                                updateDelevery.append("numero_bordereau", values.numero_bordereau),
+                                                updateDelevery.append("fournisseur", values.fournisseur),
+                                                updateDelevery.append("facture", values.photo)
 
-                                              // update delevery
-                                              onUpdateDelevery(updateDelevery);
+                                                // update delevery
+                                                onUpdateDelevery(updateDelevery);
                                             } else {
-                                              const newDelevery = {
-                                                numero_bordereau: values["numero_bordereau"],
-                                                fournisseur:
-                                                  values["fournisseur"],
-                                              };
+                                              let newDelevery = new FormData();
+                                              newDelevery.append("id", delevery.id),
+                                              newDelevery.append("numero_bordereau", values["numero_bordereau"]),
+                                              newDelevery.append("fournisseur", values["fournisseur"]),
+                                              newDelevery.append("facture", values["photo"])
+                                              // const newDelevery = {
+                                              //   numero_bordereau: values["numero_bordereau"],
+                                              //   fournisseur:
+                                              //     values["fournisseur"],
+                                              //   facture: values["photo"]
+                                              // };
                                               // save new delevery
                                               onAddNewDelevery(newDelevery);
                                             }
@@ -346,7 +364,7 @@ class DeliverysList extends Component {
                                             this.toggle();
                                           }}
                                         >
-                                          {({ errors, status, touched }) => (
+                                          {({setFieldValue, errors, status, touched}) => (
                                             <Form>
                                               <Row>
                                                 <Col className="col-12">
@@ -388,6 +406,30 @@ class DeliverysList extends Component {
                                                     />
                                                     <ErrorMessage
                                                       name="fournisseur"
+                                                      component="div"
+                                                      className="invalid-feedback"
+                                                    />
+                                                  </div>
+                                                  <div className="mb-3">
+                                                    <Label className="form-label">
+                                                      Attach Document
+                                                    </Label>
+                                                    <Input
+                                                      name="photo"
+                                                      type="file"
+                                                      onChange={(event) => 
+                                                        setFieldValue("photo", event.target.files[0])
+                                                      }
+                                                      className={
+                                                        "form-control" +
+                                                        (errors.photo &&
+                                                        touched.photo
+                                                          ? " is-invalid"
+                                                          : "")
+                                                      }
+                                                    />
+                                                    <ErrorMessage
+                                                      name="photo"
                                                       component="div"
                                                       className="invalid-feedback"
                                                     />
