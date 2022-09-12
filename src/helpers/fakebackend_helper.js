@@ -105,7 +105,7 @@ export const deleteDelevery = (delivery, id) => del(API_URL+"/stock/"+id+"/livra
 
 ////////////////
 // get products
-export const getproducts = () => get("/stock/produits") // add this route to get all products
+export const getProducts = () => get("/stock/produits") // add this route to get all products
 // add product
 export const addNewProduct = (product) => post(API_URL+"/stock/produit", product) // add this route to add product
 // put product
@@ -200,8 +200,6 @@ export const postSocialLogin = data => post(url.SOCIAL_LOGIN, data)
 
 
 
-// get Products
-export const getProducts = () => get(url.GET_PRODUCTS)
 
 // get Product detail
 export const getProductDetail = id =>

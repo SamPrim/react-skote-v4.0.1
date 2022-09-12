@@ -37,32 +37,43 @@ import DeleteModal from "components/Common/DeleteModal";
 import { withTranslation } from "react-i18next";
 
 import {
-  getCategories,
-  addNewCategorie,
-  updateCategorie,
-  deleteCategorie,
+  getProducts,
+  addNewProduct,
+  updateProduct,
+  deleteProduct,
+} from "store/products/actions";
+import {
+    getCategories,
 } from "store/categories/actions";
 import {
-    getNatures,
-  } from "store/natures/actions";
+  getLocals,
+} from "store/local/actions";
+import {
+  getDeleverys,
+} from "store/delevery/actions";
 
 import { isEmpty, size, map } from "lodash";
+import Products from "store/products/reducer";
 
-class CategoriesList extends Component {
+
+
+class ProductsList extends Component {
   constructor(props) {
     super(props);
     this.node = React.createRef();
     this.state = {
-      categories: [],
-      categorie: "",
+      products: [],
+      product: "",
       modal: false,
+      name: "",
+      searchText:  this.props.location.search.split("=")[1],
       deleteModal: false,
       contactListColumns: [
         {
           text: "#",
           dataField: "id",
           sort: true,
-          formatter: (cellContent, categorie) => <>#{categorie.id}</>,
+          formatter: (cellContent, product) => <>#{product.id}</>,
         },
         {
           text: "Name",
@@ -75,12 +86,27 @@ class CategoriesList extends Component {
           sort: true,
         },
         {
-            dataField: "nature.name",
-            text: "Nature",
+          dataField: "stock_physic",
+          text: "En Stock",
+          sort: true,
+        },
+        {
+          dataField: "stock_limit",
+          text: "Stock Limite",
+          sort: true,
+        },
+        {
+          dataField: "livraison.numero_bordereau",
+          text: "Delivery Attach",
+          sort: true,
+        },
+        {
+            dataField: "categorie.name",
+            text: "Categorie",
             sort: true,
-            formatter: (cellContent, categorie) => (
+            formatter: (cellContent, product) => (
                 <>
-                    {categorie.nature ? categorie.nature.name : 'N/A'}
+                    {product.categorie ? product.categorie.name : 'N/A'}
                 </>
             ),
         },
@@ -88,31 +114,36 @@ class CategoriesList extends Component {
             dataField: "parent.name",
             text: "Parent",
             sort: true,
-            formatter: (cellContent, categorie) => (
+            formatter: (cellContent, product) => (
                 <>
-                    {categorie.parent ? categorie.parent.name : 'N/A'}
+                    {product.parent ? product.parent.name : 'N/A'}
                 </>
             ),
         },
+        {
+          dataField: "manager.fullname",
+          text: "Manager",
+          sort: true,
+      },
         {
           dataField: "menu",
           isDummyField: true,
           editable: false,
           text: "Action",
-          formatter: (cellContent, categorie) => (
+          formatter: (cellContent, product) => (
             <div className="d-flex gap-3">
               <Link className="text-success" to="#">
                 <i
                   className="mdi mdi-pencil font-size-18"
                   id="edittooltip"
-                  onClick={() => this.handleCategorieClick(categorie)}
+                  onClick={() => this.handleProductClick(product)}
                 ></i>
               </Link>
               <Link className="text-danger" to="#">
                 <i
                   className="mdi mdi-delete font-size-18"
                   id="deletetooltip"
-                  onClick={() => this.onClickDelete(categorie)}
+                  onClick={() => this.onClickDelete(product)}
                 ></i>
               </Link>
             </div>
@@ -120,21 +151,28 @@ class CategoriesList extends Component {
         },
       ],
     };
-    this.handleCategorieClick = this.handleCategorieClick.bind(this);
+    this.handleProductClick = this.handleProductClick.bind(this);
     this.toggle = this.toggle.bind(this);
-    this.handleCategorieClicks = this.handleCategorieClicks.bind(this);
+    this.handleProductClicks = this.handleProductClicks.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
   }
   
 
   componentDidMount() {
-    const { categories, onGetCategories, onGetNatures } = this.props;
-    if (categories && !categories.length) {
+    const { products, onGetProducts, onGetCategories, onGetLocals, onGetDeleverys } = this.props;
+    if (products && !products.length) {
+      onGetProducts();
       onGetCategories();
-      onGetNatures();
+      onGetLocals();
+      onGetDeleverys();
     }
-    this.setState({ categories });
-    console.log(this.state.categories);
+    this.setState({ products });
+    console.log(this.state.products);
+
+    if (localStorage.getItem("authUser")) {
+        const obj = JSON.parse(localStorage.getItem("authUser"))
+        this.setState({name: obj.id});
+    }
   }
 
   toggle() {
@@ -143,17 +181,17 @@ class CategoriesList extends Component {
     }));
   }
 
-  handleCategorieClicks = () => {
-    this.setState({ categorie: "", isEdit: false });
+  handleProductClicks = () => {
+    this.setState({ product: "", isEdit: false });
     this.toggle();
   };
 
   // eslint-disable-next-line no-unused-vars
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const { categories } = this.props;
-    if (!isEmpty(categories) && size(prevProps.categories) !== size(categories)) {
-      this.setState({ categories: {}, isEdit: false });
-        // this.setState({ ...this.state, categories: this.props.categoriesData });
+    const { products } = this.props;
+    if (!isEmpty(products) && size(prevProps.products) !== size(products)) {
+      this.setState({ products: {}, isEdit: false });
+        // this.setState({ ...this.state, products: this.props.productsData });
     }
   }
 
@@ -177,29 +215,32 @@ class CategoriesList extends Component {
     }));
   };
 
-  onClickDelete = categories => {
-    this.setState({ categories: categories });
+  onClickDelete = products => {
+    this.setState({ products: products });
     this.setState({ deleteModal: true });
   };
 
-  handleDeleteCategorie = () => {
-    const { onDeleteCategorie } = this.props;
-    const { categories } = this.state;
-    if (categories.id !== undefined) {
-      onDeleteCategorie(categories, categories.id);
+  handleDeleteProduct = () => {
+    const { onDeleteProduct } = this.props;
+    const { products } = this.state;
+    if (products.id !== undefined) {
+      onDeleteProduct(products, products.id);
       this.setState({ deleteModal: false });
     }
   };
 
-  handleCategorieClick = arg => {
-    const categorie = arg;
+  handleProductClick = arg => {
+    const product = arg;
 
     this.setState({
-      categorie: {
-        id: categorie.id,
-        name: categorie.name,
-        description: categorie.description,
-        // nature_id: categorie.nature.id
+      product: {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        stock_physic: product.stock_physic,
+        stock_limit: product.stock_limit,
+        stock_desire: product.stock_desire,
+        parent_id: product.parent ? product.parent.id : 0
       },
       isEdit: true,
     });
@@ -210,20 +251,20 @@ class CategoriesList extends Component {
   render() {
     //meta title
 
-    document.title = "Categorie | Admin";
+    document.title = "product | Admin";
 
-    // const { categorie } = this.state
+    // const { product } = this.state
     const { SearchBar } = Search;
 
-    const { categories } = this.props;
+    const { products } = this.props;
 
     const { isEdit, deleteModal } = this.state;
 
-    const { onAddNewCategorie, onUpdateCategorie } = this.props;
-    const categorie = this.state.categorie;
+    const { onAddNewProduct, onUpdateProduct } = this.props;
+    const product = this.state.product;
     const pageOptions = {
       sizePerPage: 10,
-      totalSize: categories.length, // replace later with size(categorie),
+      totalSize: products.length, // replace later with size(product),
       custom: true,
     };
 
@@ -237,18 +278,18 @@ class CategoriesList extends Component {
     const selectRow = {
       mode: "checkbox",
     };
-
+    console.log("test ",this.props.location.search.split("=")[1])
     return (
       <React.Fragment>
         <DeleteModal
           show={deleteModal}
-          onDeleteClick={this.handleDeleteCategorie}
+          onDeleteClick={this.handleDeleteProduct}
           onCloseClick={() => this.setState({ deleteModal: false })}
         />
         <div className="page-content">
           <Container fluid>
             {/* Render Breadcrumbs */}
-            <Breadcrumbs title="Categories" breadcrumbItem="Categories List" />
+            <Breadcrumbs title="Products" breadcrumbItem="Products List" />
             <Row>
               <Col lg="12">
                 <Card>
@@ -257,14 +298,17 @@ class CategoriesList extends Component {
                       pagination={paginationFactory(pageOptions)}
                       keyField="id"
                       columns={this.state.contactListColumns}
-                      data={categories}
+                      data={products}
                     >
                       {({ paginationProps, paginationTableProps }) => (
                         <ToolkitProvider
                           keyField="id"
                           columns={this.state.contactListColumns}
-                          data={categories}
-                          search
+                          data={products}
+                          search={ {
+                            defaultSearch: this.state.searchText ? this.state.searchText : ""
+                          } }
+                          
                         >
                           {toolkitprops => (
                             <React.Fragment>
@@ -284,10 +328,10 @@ class CategoriesList extends Component {
                                     <Button
                                       color="primary"
                                       className="font-16 btn-block btn btn-primary"
-                                      onClick={this.handleCategorieClicks}
+                                      onClick={this.handleProductClicks}
                                     >
                                       <i className="mdi mdi-plus-circle-outline me-1" />
-                                      {this.props.t("Create New Category")}
+                                      {this.props.t("Create New Product")}
                                     </Button>
                                   </div>
                                 </Col>
@@ -317,15 +361,19 @@ class CategoriesList extends Component {
                                         toggle={this.toggle}
                                         tag="h4"
                                       >
-                                        {!!isEdit ? this.props.t("Edit Category") : this.props.t("Add Category")}
+                                        {!!isEdit ? this.props.t("Edit Product") : this.props.t("Add Product")}
                                       </ModalHeader>
                                       <ModalBody>
                                         <Formik
                                           enableReinitialize={true}
                                           initialValues={{
-                                            name: (categorie && categorie.name) || "",
+                                            name: (product && product.name) || "",
                                             description:
-                                              (categorie && categorie.description) || ""
+                                              (product && product.description) || "",
+                                            stock_physic: (product && product.stock_physic) || "",
+                                            stock_limit: (product && product.stock_limit) || "",
+                                            stock_desire: (product && product.stock_desire) || "",
+                                            parent_id: (product && product.parent ? product.parent.id:0) || ""
                                           }}
                                           validationSchema={Yup.object().shape({
                                             name: Yup.string().required(
@@ -334,35 +382,45 @@ class CategoriesList extends Component {
                                             description: Yup.string().required(
                                               this.props.t("Please Enter Description")
                                             ),
-                                            nature_id: Yup.string().required(
+                                            categorie_id: Yup.string().required(
                                                 this.props.t("Please Enter Country")
                                               ),
                                           })}
                                           onSubmit={values => {
                                             if (isEdit) {
-                                              const updateCategorie = {
-                                                id: categorie.id,
+                                              const updateProduct = {
+                                                id: product.id,
                                                 name: values.name,
                                                 description: values.description,
-                                                nature_id: values.nature_id,
-                                                parent_id: values.parent_id
+                                                livraison_id: values.livraison_id,
+                                                categorie_id: values.categorie_id,
+                                                stock_desire: values.stock_desire,
+                                                stock_limit: values.stock_limit,
+                                                stock_physic: values.stock_physic,
+                                                parent_id: values.parent_id ? values.parent_id:null
                                               };
 
-                                              // update categorie
-                                              onUpdateCategorie(updateCategorie);
+                                              // update product
+                                              onUpdateProduct(updateProduct);
                                             } else {
-                                              const newCategorie = {
+                                              const newProduct = {
                                                 name: values["name"],
                                                 description:
                                                   values["description"],
-                                                nature_id: values["nature_id"],
-                                                parent_id: values["parent_id"]
+                                                livraison_id: values["livraison_id"],
+                                                categorie_id: values["categorie_id"],
+                                                stock_desire: values["stock_desire"],
+                                                stock_limit: values["stock_limit"],
+                                                stock_physic: values["stock_physic"],
+                                                parent_id: values["parent_id"] ? values["parent_id"]:null,
+                                                manager_id: this.state.name,
+                                                date_created: Date.now()
                                               };
                                               // save new Citie
-                                              onAddNewCategorie(newCategorie);
+                                              onAddNewProduct(newProduct);
                                             }
                                             this.setState({
-                                              selectedCategorie: null,
+                                              selectedProduct: null,
                                             });
                                             this.toggle();
                                           }}
@@ -394,10 +452,10 @@ class CategoriesList extends Component {
                                                   </div>
                                                   <div className="mb-3">
                                                     <Label className="form-label">
-                                                      Nature
+                                                      Livraison
                                                     </Label>
                                                     <Field
-                                                      name="nature_id"
+                                                      name="livraison_id"
                                                       as="select"
                                                       className={
                                                         "form-control" +
@@ -410,23 +468,23 @@ class CategoriesList extends Component {
                                                     >
                                                       <option>---</option>
                                                       {
-                                                        this.props.natures.map((nature) => (
-                                                          <option key={nature.id} value={nature.id}>{nature.name}</option>
+                                                        this.props.deleverys.map((delevery) => (
+                                                          <option key={delevery.id} value={delevery.id}>{delevery.numero_bordereau}</option>
                                                         ))
                                                       }
                                                     </Field>
                                                   </div>
                                                   <div className="mb-3">
                                                     <Label className="form-label">
-                                                      Ratache to
+                                                      Categorie
                                                     </Label>
                                                     <Field
-                                                      name="parent_id"
+                                                      name="categorie_id"
                                                       as="select"
                                                       className={
                                                         "form-control" +
-                                                        (errors.parent_id &&
-                                                        touched.parent_id
+                                                        (errors.categorie_id &&
+                                                        touched.categorie_id
                                                           ? " is-invalid"
                                                           : "")
                                                       }
@@ -442,7 +500,108 @@ class CategoriesList extends Component {
                                                   </div>
                                                   <div className="mb-3">
                                                     <Label className="form-label">
-                                                      Description
+                                                      Parent
+                                                    </Label>
+                                                    <Field
+                                                      name="parent_id"
+                                                      as="select"
+                                                      className={
+                                                        "form-control" +
+                                                        (errors.parent_id &&
+                                                        touched.parent_id
+                                                          ? " is-invalid"
+                                                          : "")
+                                                      }
+                                                      multiple={false}
+                                                    >
+                                                      <option>---</option>
+                                                      {
+                                                        this.props.products.map((product) => (
+                                                          <option key={product.id} value={product.id}>{product.name}</option>
+                                                        ))
+                                                      }
+                                                    </Field>
+                                                  </div>
+                                                </Col>
+                                                </Row>
+                                                
+                                                <Row>
+                                                  <Col lg={4}>
+                                                    <div className="mb-3">
+                                                      <Label className="form-label">
+                                                        Quantité
+                                                      </Label>
+                                                      <Field
+                                                        name="stock_physic"
+                                                        type="number"
+                                                        className={
+                                                          "form-control" +
+                                                          (errors.stock_physic &&
+                                                          touched.stock_physic
+                                                            ? " is-invalid"
+                                                            : "")
+                                                        }
+                                                      />
+                                                      <ErrorMessage
+                                                        name="stock_physic"
+                                                        component="div"
+                                                        className="invalid-feedback"
+                                                      />
+                                                    </div>
+                                                  </Col>
+                                                  <Col lg={4}>
+                                                    <div className="mb-3">
+                                                      <Label className="form-label">
+                                                        Stock Désiré
+                                                      </Label>
+                                                      <Field
+                                                        name="stock_desire"
+                                                        type="number"
+                                                        className={
+                                                          "form-control" +
+                                                          (errors.stock_desire &&
+                                                          touched.stock_desire
+                                                            ? " is-invalid"
+                                                            : "")
+                                                        }
+                                                      />
+                                                      <ErrorMessage
+                                                        name="stock_desire"
+                                                        component="div"
+                                                        className="invalid-feedback"
+                                                      />
+                                                    </div>
+                                                  </Col>
+                                                  <Col lg={4}>
+                                                    <div className="mb-3">
+                                                      <Label className="form-label">
+                                                        Limite en Stock
+                                                      </Label>
+                                                      <Field
+                                                        name="stock_limit"
+                                                        type="number"
+                                                        className={
+                                                          "form-control" +
+                                                          (errors.stock_limit &&
+                                                          touched.stock_limit
+                                                            ? " is-invalid"
+                                                            : "")
+                                                        }
+                                                      />
+                                                      <ErrorMessage
+                                                        name="stock_limit"
+                                                        component="div"
+                                                        className="invalid-feedback"
+                                                      />
+                                                    </div>
+                                                  </Col>
+                                                </Row>
+
+                                                <Row>
+                                                  <Col>
+                                                  <div className="mb-3">
+                                                    <Label className="form-label">
+                                                     Description
                                                     </Label>
                                                     <Field
                                                       name="description"
@@ -506,32 +665,40 @@ class CategoriesList extends Component {
   }
 }
 
-CategoriesList.propTypes = {
+ProductsList.propTypes = {
+  products: PropTypes.array,
   categories: PropTypes.array,
-  natures: PropTypes.array,
+  deleverys: PropTypes.array,
+  locals: PropTypes.array,
   className: PropTypes.any,
+  onGetProducts: PropTypes.func,
+  onAddNewProduct: PropTypes.func,
+  onDeleteProduct: PropTypes.func,
+  onUpdateProduct: PropTypes.func,
   onGetCategories: PropTypes.func,
-  onAddNewCategorie: PropTypes.func,
-  onDeleteCategorie: PropTypes.func,
-  onUpdateCategorie: PropTypes.func,
-  onGetNatures: PropTypes.func,
+  onGetLocals: PropTypes.func,
+  onGetDeleverys: PropTypes.func,
   t: PropTypes.func,
 };
 
-const mapStateToProps = ({ Natures, Categories }) => ({
-  natures: Natures.natures,
-  categories: Categories.categories
+const mapStateToProps = ({ Products, Deleverys, Categories, Locals }) => ({
+  products: Products.products,
+  deleverys: Deleverys.deleverys,
+  categories: Categories.categories,
+  locals: Locals.locals
 });
 
 const mapDispatchToProps = dispatch => ({
+  onGetProducts: () => dispatch(getProducts()),
+  onAddNewProduct: categorie => dispatch(addNewProduct(categorie)),
+  onUpdateProduct: categorie => dispatch(updateProduct(categorie)),
+  onDeleteProduct: categorie => dispatch(deleteProduct(categorie)),
   onGetCategories: () => dispatch(getCategories()),
-  onAddNewCategorie: categorie => dispatch(addNewCategorie(categorie)),
-  onUpdateCategorie: categorie => dispatch(updateCategorie(categorie)),
-  onDeleteCategorie: categorie => dispatch(deleteCategorie(categorie)),
-  onGetNatures: () => dispatch(getNatures()),
+  onGetLocals: () => dispatch(getLocals()),
+  onGetDeleverys: () => dispatch(getDeleverys()),
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(withTranslation()(CategoriesList)));
+)(withRouter(withTranslation()(ProductsList)));

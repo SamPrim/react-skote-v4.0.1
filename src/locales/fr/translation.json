@@ -19,7 +19,6 @@
   "Cart": "Cart",
   "Checkout": "Checkout",
   "Shops": "Shops",
-  "Add Product": "Add Product",
   "Wallet": "Wallet",
   "Buy/Sell": "Buy/Sell",
   "Exchange": "Exchange",
@@ -197,6 +196,8 @@
   "Edit Category": "Modifier Categorie",
   "Add Category": "Ajouter Categorie",
   "Edit Delivery": "Modifier Livraison",
+  "Add Product": "Ajouter Produit",
+  "Edit Product": "Modifier Produit",
   "Add Delivery": "Ajouter Livraison",
   "Create New Countrie": "Nouveau Pays",
   "Create New Citie": "Nouvelle Ville",
@@ -205,5 +206,6 @@
   "Create New Category": "Nouvelle Categorie",
   "Category": "Categorie",
   "New Delivery": "Nouvelle Livraison",
-  "Create New Delivery": "Nouvelle Livraison"
+  "Create New Delivery": "Nouvelle Livraison",
+  "Create New Product": "Nouveau Produit"
 }

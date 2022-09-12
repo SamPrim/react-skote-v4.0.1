@@ -38,6 +38,10 @@ import DeleteModal from "components/Common/DeleteModal";
 //i18n
 import { withTranslation } from "react-i18next";
 
+//Lightbox
+import Lightbox from "react-image-lightbox";
+import "react-image-lightbox/style.css";
+
 import {
   getDeleverys,
   addNewDelevery,
@@ -55,6 +59,7 @@ class DeliverysList extends Component {
       deleverys: [],
       delevery: "",
       modal: false,
+      isFits: false,
       deleteModal: false,
       contactListColumns: [
         {
@@ -69,8 +74,8 @@ class DeliverysList extends Component {
           sort: true,
         },
         {
-          dataField: "fournisseur",
           text: "Fournisseur",
+          dataField: "fournisseur",
           sort: true,
         },
         {
@@ -88,8 +93,13 @@ class DeliverysList extends Component {
           sort: true,
           formatter: (cellContent, delevery) => (
               <p className="mb-1">
+                    <i
+                      className="mdi mdi-file font-size-18"
+                      id="edittooltip"
+                    ></i>
                   {delevery.numero_bordereau+"-"+delevery.fournisseur+".png"}
               </p>
+              
             ),
         },
         {
@@ -99,6 +109,13 @@ class DeliverysList extends Component {
           text: "Action",
           formatter: (cellContent, delevery) => (
             <div className="d-flex gap-3">
+              <Link className="text-info" to={"/products?searchText="+delevery.numero_bordereau}>
+                <i
+                  className="mdi mdi-eye font-size-18"
+                  id="edittooltip"
+                  onClick={() => this.handleDeleveryClick(delevery)}
+                ></i>
+              </Link>
               <Link className="text-success" to="#">
                 <i
                   className="mdi mdi-pencil font-size-18"
@@ -113,6 +130,16 @@ class DeliverysList extends Component {
                   onClick={() => this.onClickDelete(delevery)}
                 ></i>
               </Link>
+              <a className="text-success" 
+                href={process.env.REACT_APP_STATIC_URL+"livraisons/"+delevery.numero_bordereau+"-"+delevery.fournisseur+".png"}
+                target="_blank"
+                rel="noreferrer"
+               >
+                <i
+                  className="mdi mdi-file-eye font-size-18"
+                  id="deletetooltip"
+                ></i>
+              </a>
             </div>
           ),
         },
@@ -245,6 +272,7 @@ class DeliverysList extends Component {
           <Container fluid>
             {/* Render Breadcrumbs */}
             <Breadcrumbs title="Delivery" breadcrumbItem="Delivery List" />
+
             <Row>
               <Col lg="12">
                 <Card>
@@ -345,7 +373,6 @@ class DeliverysList extends Component {
                                                 onUpdateDelevery(updateDelevery);
                                             } else {
                                               let newDelevery = new FormData();
-                                              newDelevery.append("id", delevery.id),
                                               newDelevery.append("numero_bordereau", values["numero_bordereau"]),
                                               newDelevery.append("fournisseur", values["fournisseur"]),
                                               newDelevery.append("facture", values["photo"])

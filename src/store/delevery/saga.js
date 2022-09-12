@@ -37,7 +37,15 @@ function* fetchDeleverys() {
 
 function* onAddNewDelevery({ payload: delevery }) {
   try {
-    const response = yield call(addNewDelevery, delevery)
+    // const response = yield call(addNewDelevery, delevery)
+    yield axios({
+      method: "post",
+      url:"http://localhost:8000/stock/livraison",
+      data: delevery,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
     yield fetchDeleverys()
     // yield put(addGroupSuccess(response))
   } catch (error) {
@@ -51,7 +59,7 @@ function* onUpdateDelevery({ payload: delevery }) {
     // const response = yield call(updateDelevery, delevery, delevery.get("id"))
     yield axios({
       method: "put",
-      url:"http://localhost:8000/stock/4/livraison",
+      url:"http://localhost:8000/stock/"+delevery.get("id")+"/livraison",
       data: delevery,
       headers: {
         'Content-Type': 'multipart/form-data'

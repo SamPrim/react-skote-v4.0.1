@@ -60,6 +60,10 @@ import Categories from "./categories/reducer";
 // Delevery
 import Deleverys from "./delevery/reducer"
 
+// Products
+
+import Products from "./products/reducer"
+
 const rootReducer = combineReducers({
   // public
   Layout,
@@ -84,6 +88,7 @@ const rootReducer = combineReducers({
   Natures, // add
   Categories, // add
   Deleverys, // add
+  Products, // add
 })
 
 export default rootReducer

@@ -23,6 +23,7 @@ import localsSaga from "./local/saga";
 import naturesSaga from "./natures/saga"
 import categoriesSaga from "./categories/saga"
 import deleverysSaga from "./delevery/saga"
+import productsSaga from "./products/saga"
 
 export default function* rootSaga() {
   yield all([
@@ -48,6 +49,7 @@ export default function* rootSaga() {
     fork(localsSaga),
     fork(naturesSaga),
     fork(categoriesSaga),
-    fork(deleverysSaga)
+    fork(deleverysSaga),
+    fork(productsSaga)
   ])
 }
