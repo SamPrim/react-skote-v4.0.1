@@ -43,6 +43,10 @@ import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
 
 import {
+  getUsers,
+} from "store/contacts/actions";
+
+import {
   getDeleverys,
   addNewDelevery,
   updateDelevery,
@@ -75,7 +79,7 @@ class DeliverysList extends Component {
         },
         {
           text: "Fournisseur",
-          dataField: "fournisseur",
+          dataField: "fournisseur.fullname",
           sort: true,
         },
         {
@@ -97,7 +101,7 @@ class DeliverysList extends Component {
                       className="mdi mdi-file font-size-18"
                       id="edittooltip"
                     ></i>
-                  {delevery.numero_bordereau+"-"+delevery.fournisseur+".png"}
+                  {delevery.document ? delevery.document.substring(0, 24) + "...":delevery.numero_bordereau+"-"+delevery.fournisseur+".png"}
               </p>
               
             ),
@@ -153,9 +157,10 @@ class DeliverysList extends Component {
   
 
   componentDidMount() {
-    const { deleverys, onGetDeleverys } = this.props;
+    const { deleverys, onGetDeleverys, onGetUsers } = this.props;
     if (deleverys && !deleverys.length) {
       onGetDeleverys();
+      onGetUsers();
     }
     this.setState({ deleverys });
     console.log(this.state.deleverys);
@@ -361,29 +366,60 @@ class DeliverysList extends Component {
                                             ),
                                           })}
                                           onSubmit={values => {
-                                            console.log(values);
                                             if (isEdit) {
+                                              console.log(delevery.document)
+                                                var file = ''
+                                                var images = []
                                                 let updateDelevery = new FormData();
-                                                updateDelevery.append("id", delevery.id),
-                                                updateDelevery.append("numero_bordereau", values.numero_bordereau),
-                                                updateDelevery.append("fournisseur", values.fournisseur),
-                                                updateDelevery.append("facture", values.photo)
+                                                if(values.photo){
+                                                for(let i=0;i<=values.photo.length-1;i++){
+                                                  if(file==''){
+                                                    file = values.photo[i].name
+                                                  }
+                                                  else{
+                                                    file = file +';'+ values.photo[i].name
+                                                  }
+                                                  updateDelevery.append("facture", values.photo[i])
+                                                  updateDelevery.append("id", delevery.id),
+                                                  updateDelevery.append("numero_bordereau", values.numero_bordereau),
+                                                  updateDelevery.append("fournisseur", values.fournisseur),
+                                                  updateDelevery.append("filename", values.photo[i].name)
 
-                                                // update delevery
-                                                onUpdateDelevery(updateDelevery);
+                                                  // update delevery
+                                                  onUpdateDelevery(updateDelevery);
+                                                }}
+                                                  updateDelevery.append("facture", values.photo ? values.photo[values.photo.length-1]:null)
+                                                  updateDelevery.append("id", delevery.id),
+                                                  updateDelevery.append("numero_bordereau", values.numero_bordereau),
+                                                  updateDelevery.append("fournisseur", values.fournisseur),
+                                                  updateDelevery.append("filename", values.photo ? file:delevery.document)
+
+                                                  // update delevery
+                                                  onUpdateDelevery(updateDelevery);
+                                                
                                             } else {
                                               let newDelevery = new FormData();
-                                              newDelevery.append("numero_bordereau", values["numero_bordereau"]),
-                                              newDelevery.append("fournisseur", values["fournisseur"]),
-                                              newDelevery.append("facture", values["photo"])
-                                              // const newDelevery = {
-                                              //   numero_bordereau: values["numero_bordereau"],
-                                              //   fournisseur:
-                                              //     values["fournisseur"],
-                                              //   facture: values["photo"]
-                                              // };
-                                              // save new delevery
-                                              onAddNewDelevery(newDelevery);
+                                              var file = ''
+                                                var images = []
+                                                let updateDelevery = new FormData();
+                                                newDelevery.append("numero_bordereau", values["numero_bordereau"]),
+                                                newDelevery.append("fournisseur", values["fournisseur"]),
+                                                newDelevery.append("facture", values["photo"][0]),
+                                                newDelevery.append("filename", values["photo"][0].name)
+                                                onAddNewDelevery(newDelevery);
+                                                for(let i=1;i<=values.photo.length-1;i++){
+                                                  if(file==''){
+                                                    file = values.photo[i].name
+                                                  }
+                                                  else{
+                                                    file = file +';'+ values.photo[i].name
+                                                  }
+                                                  newDelevery.append("numero_bordereau", values["numero_bordereau"]),
+                                                  newDelevery.append("fournisseur", values["fournisseur"]),
+                                                  newDelevery.append("facture", values["photo"][values.photo.length-1]),
+                                                  newDelevery.append("filename", file)
+                                                  onUpdateDelevery(newDelevery);
+                                                }
                                             }
                                             this.setState({
                                               selectedDelivery: null,
@@ -392,7 +428,7 @@ class DeliverysList extends Component {
                                           }}
                                         >
                                           {({setFieldValue, errors, status, touched}) => (
-                                            <Form>
+                                            <Form enctype="multipart/form-data">
                                               <Row>
                                                 <Col className="col-12">
                                                   <div className="mb-3">
@@ -422,7 +458,7 @@ class DeliverysList extends Component {
                                                     </Label>
                                                     <Field
                                                       name="fournisseur"
-                                                      type="textarea"
+                                                      as="select"
                                                       className={
                                                         "form-control" +
                                                         (errors.fournisseur &&
@@ -430,7 +466,16 @@ class DeliverysList extends Component {
                                                           ? " is-invalid"
                                                           : "")
                                                       }
-                                                    />
+                                                      multiple={false}
+                                                    >
+                                                      <option>---</option>
+                                                      {
+                                                        this.props.users.map((user) => (
+                                                         ( user.groups.name =="fournisseur" ? <option key={user.id} value={user.id}>{user.fullname}</option>
+                                                         :'')
+                                                         ))
+                                                      }
+                                                    </Field>
                                                     <ErrorMessage
                                                       name="fournisseur"
                                                       component="div"
@@ -444,8 +489,9 @@ class DeliverysList extends Component {
                                                     <Input
                                                       name="photo"
                                                       type="file"
+                                                      multiple
                                                       onChange={(event) => 
-                                                        setFieldValue("photo", event.target.files[0])
+                                                        setFieldValue("photo", event.target.files)
                                                       }
                                                       className={
                                                         "form-control" +
@@ -508,16 +554,19 @@ class DeliverysList extends Component {
 
 DeliverysList.propTypes = {
   deleverys: PropTypes.array,
+  users: PropTypes.array,
   className: PropTypes.any,
   onGetDeleverys: PropTypes.func,
+  onGetUsers: PropTypes.func,
   onAddNewDelevery: PropTypes.func,
   onDeleteDelevery: PropTypes.func,
   onUpdateDelevery: PropTypes.func,
   t: PropTypes.func,
 };
 
-const mapStateToProps = ({ Deleverys }) => ({
+const mapStateToProps = ({ Deleverys, contacts }) => ({
   deleverys: Deleverys.deleverys,
+  users: contacts.users,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -525,6 +574,7 @@ const mapDispatchToProps = dispatch => ({
   onAddNewDelevery: delevery => dispatch(addNewDelevery(delevery)),
   onUpdateDelevery: delevery => dispatch(updateDelevery(delevery)),
   onDeleteDelevery: delevery => dispatch(deleteDelevery(delevery)),
+  onGetUsers: () => dispatch(getUsers()),
 });
 
 export default connect(

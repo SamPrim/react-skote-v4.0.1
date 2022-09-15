@@ -33,6 +33,7 @@ import * as Yup from "yup";
 //Import Breadcrumb
 import Breadcrumbs from "components/Common/Breadcrumb";
 import DeleteModal from "components/Common/DeleteModal";
+import FormUpload from "./ui/Dropzone"
 //i18n
 import { withTranslation } from "react-i18next";
 
@@ -60,12 +61,15 @@ import Products from "store/products/reducer";
 class ProductsList extends Component {
   constructor(props) {
     super(props);
+    this.closeModal = this.closeModal.bind(this)
     this.node = React.createRef();
     this.state = {
       products: [],
       product: "",
       modal: false,
+      modal_center: false,
       name: "",
+      id: "",
       searchText:  this.props.location.search.split("=")[1],
       deleteModal: false,
       contactListColumns: [
@@ -132,6 +136,13 @@ class ProductsList extends Component {
           text: "Action",
           formatter: (cellContent, product) => (
             <div className="d-flex gap-3">
+              <Link className="text-info" to="#">
+                <i
+                  className="mdi mdi-file-plus font-size-18"
+                  id="edittooltip"
+                  onClick={() => this.tog_center(product.id)}
+                ></i>
+              </Link>
               <Link className="text-success" to="#">
                 <i
                   className="mdi mdi-pencil font-size-18"
@@ -153,10 +164,27 @@ class ProductsList extends Component {
     };
     this.handleProductClick = this.handleProductClick.bind(this);
     this.toggle = this.toggle.bind(this);
+    this.tog_center = this.tog_center.bind(this)
     this.handleProductClicks = this.handleProductClicks.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
   }
+
+  closeModal(){
+    this.setState({ modal_center: false })
+  }
   
+  removeBodyCss() {
+    document.body.classList.add("no_padding")
+  }
+
+  tog_center(id) {
+    this.setState(prevState => ({
+      modal_center: !prevState.modal_center,
+    }))
+    this.setState({ 
+      id: id })
+    this.removeBodyCss()
+  }
 
   componentDidMount() {
     const { products, onGetProducts, onGetCategories, onGetLocals, onGetDeleverys } = this.props;
@@ -286,6 +314,29 @@ class ProductsList extends Component {
           onDeleteClick={this.handleDeleteProduct}
           onCloseClick={() => this.setState({ deleteModal: false })}
         />
+        <Modal
+          isOpen={this.state.modal_center}
+          toggle={this.tog_center}
+          centered={true}
+        >
+          <div className="modal-header">
+            <h5 className="modal-title mt-0">{this.props.t("Add document")}</h5>
+            <button
+              type="button"
+              onClick={() =>
+                this.setState({ modal_center: false })
+              }
+              className="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div className="modal-body">
+              <FormUpload closeModal = {this.closeModal} id = {this.state.id} />
+          </div>
+        </Modal>
         <div className="page-content">
           <Container fluid>
             {/* Render Breadcrumbs */}
