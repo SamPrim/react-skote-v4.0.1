@@ -13,7 +13,13 @@ import {
   ModalHeader,
   ModalBody,
   Label,
+  Nav,
+  NavItem,
+  NavLink,
+  TabContent,
+  TabPane,
 } from "reactstrap";
+import classnames from "classnames";
 import paginationFactory, {
   PaginationProvider,
   PaginationListStandalone,
@@ -55,7 +61,7 @@ import {
 
 import { isEmpty, size, map } from "lodash";
 import Products from "store/products/reducer";
-
+import UiLightbox from "./ui/LightBox"
 
 
 class ProductsList extends Component {
@@ -63,13 +69,21 @@ class ProductsList extends Component {
     super(props);
     this.closeModal = this.closeModal.bind(this)
     this.node = React.createRef();
+    this.onClickLightBox = this.onClickLightBox.bind(this)
+    this.onMovePrevRequest = this.onMovePrevRequest.bind(this)
+    this.onMoveNextRequest = this.onMoveNextRequest.bind(this)
+    this.onCloseRequest = this.onCloseRequest.bind(this)
     this.state = {
       products: [],
       product: "",
+      images: [],
+      isGallery: false,
+      photoIndex: 0,
       modal: false,
       modal_center: false,
       name: "",
       id: "",
+      activeTab: "1",
       searchText:  this.props.location.search.split("=")[1],
       deleteModal: false,
       contactListColumns: [
@@ -157,6 +171,11 @@ class ProductsList extends Component {
                   onClick={() => this.onClickDelete(product)}
                 ></i>
               </Link>
+              <i
+                className="mdi mdi-file-eye font-size-18"
+                id="deletetooltip"
+                onClick={() => this.onClickLightBox(product.document ? product.document.split(";"):null, 0)}
+              ></i>
             </div>
           ),
         },
@@ -164,6 +183,7 @@ class ProductsList extends Component {
     };
     this.handleProductClick = this.handleProductClick.bind(this);
     this.toggle = this.toggle.bind(this);
+    this.onClickLightBox = this.onClickLightBox.bind(this);
     this.tog_center = this.tog_center.bind(this)
     this.handleProductClicks = this.handleProductClicks.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
@@ -184,6 +204,34 @@ class ProductsList extends Component {
     this.setState({ 
       id: id })
     this.removeBodyCss()
+  }
+
+  onClickLightBox(images, id){
+    this.setState({ images: images })
+    this.setState({ isGallery: true, photoIndex: id })
+  }
+
+  toggleTab(tab) {
+    if (this.state.activeTab !== tab) {
+      this.setState({
+        activeTab: tab,
+      });
+    }
+  }
+
+  onCloseRequest(){this.setState({ isGallery: false })}
+
+  onMovePrevRequest(index){
+    this.setState({
+      photoIndex:
+        (index + this.state.images.length - 1) % this.state.images.length,
+    })
+  }
+
+  onMoveNextRequest(index){
+    this.setState({
+      photoIndex: (index + 1) % this.state.images.length,
+    })
   }
 
   componentDidMount() {
@@ -306,7 +354,6 @@ class ProductsList extends Component {
     const selectRow = {
       mode: "checkbox",
     };
-    console.log("test ",this.props.location.search.split("=")[1])
     return (
       <React.Fragment>
         <DeleteModal
@@ -314,11 +361,22 @@ class ProductsList extends Component {
           onDeleteClick={this.handleDeleteProduct}
           onCloseClick={() => this.setState({ deleteModal: false })}
         />
+
+        <UiLightbox 
+          images={this.state.images} 
+          isGallery={this.state.isGallery} 
+          photoIndex={this.state.photoIndex}
+          onMovePrevRequest={this.onMovePrevRequest}
+          onCloseRequest={this.onCloseRequest}
+          onMoveNextRequest={this.onMoveNextRequest}
+        />
+
         <Modal
           isOpen={this.state.modal_center}
           toggle={this.tog_center}
           centered={true}
         >
+
           <div className="modal-header">
             <h5 className="modal-title mt-0">{this.props.t("Add document")}</h5>
             <button
@@ -415,279 +473,496 @@ class ProductsList extends Component {
                                         {!!isEdit ? this.props.t("Edit Product") : this.props.t("Add Product")}
                                       </ModalHeader>
                                       <ModalBody>
-                                        <Formik
-                                          enableReinitialize={true}
-                                          initialValues={{
-                                            name: (product && product.name) || "",
-                                            description:
-                                              (product && product.description) || "",
-                                            stock_physic: (product && product.stock_physic) || "",
-                                            stock_limit: (product && product.stock_limit) || "",
-                                            stock_desire: (product && product.stock_desire) || "",
-                                            parent_id: (product && product.parent ? product.parent.id:0) || ""
-                                          }}
-                                          validationSchema={Yup.object().shape({
-                                            name: Yup.string().required(
-                                              this.props.t("Please Enter Name")
-                                            ),
-                                            description: Yup.string().required(
-                                              this.props.t("Please Enter Description")
-                                            ),
-                                            categorie_id: Yup.string().required(
-                                                this.props.t("Please Enter Country")
-                                              ),
-                                          })}
-                                          onSubmit={values => {
-                                            if (isEdit) {
-                                              const updateProduct = {
-                                                id: product.id,
-                                                name: values.name,
-                                                description: values.description,
-                                                livraison_id: values.livraison_id,
-                                                categorie_id: values.categorie_id,
-                                                stock_desire: values.stock_desire,
-                                                stock_limit: values.stock_limit,
-                                                stock_physic: values.stock_physic,
-                                                parent_id: values.parent_id ? values.parent_id:null
-                                              };
+                                        
+                                      <>
+                                          <Nav tabs>
+                                            <NavItem>
+                                              <NavLink
+                                                style={{ cursor: "pointer" }}
+                                                className={classnames({
+                                                  active: this.state.activeTab === "1",
+                                                })}
+                                                onClick={() => {
+                                                  this.toggleTab("1");
+                                                }}
+                                              >
+                                                Nouveau materiel
+                                              </NavLink>
+                                            </NavItem>
+                                            <NavItem>
+                                              <NavLink
+                                                style={{ cursor: "pointer" }}
+                                                className={classnames({
+                                                  active: this.state.activeTab === "2",
+                                                })}
+                                                onClick={() => {
+                                                  this.toggleTab("2");
+                                                }}
+                                              >
+                                                Materiel existant
+                                              </NavLink>
+                                            </NavItem>
+                                          </Nav>
+                      
+                                          <TabContent
+                                            activeTab={this.state.activeTab}
+                                            className="p-3 text-muted"
+                                          >
+                                            <TabPane tabId="1">
+                                              <Formik
+                                                enableReinitialize={true}
+                                                initialValues={{
+                                                  name: (product && product.name) || "",
+                                                  description:
+                                                    (product && product.description) || "",
+                                                  stock_physic: (product && product.stock_physic) || "",
+                                                  stock_limit: (product && product.stock_limit) || "",
+                                                  stock_desire: (product && product.stock_desire) || "",
+                                                  parent_id: (product && product.parent ? product.parent.id:0) || ""
+                                                }}
+                                                validationSchema={Yup.object().shape({
+                                                  name: Yup.string().required(
+                                                    this.props.t("Please Enter Name")
+                                                  ),
+                                                  description: Yup.string().required(
+                                                    this.props.t("Please Enter Description")
+                                                  ),
+                                                  categorie_id: Yup.string().required(
+                                                      this.props.t("Please Enter Country")
+                                                    ),
+                                                })}
+                                                onSubmit={values => {
+                                                  if (isEdit) {
+                                                    const updateProduct = {
+                                                      id: product.id,
+                                                      name: values.name,
+                                                      description: values.description,
+                                                      livraison_id: values.livraison_id,
+                                                      categorie_id: values.categorie_id,
+                                                      stock_desire: values.stock_desire,
+                                                      stock_limit: values.stock_limit,
+                                                      stock_physic: values.stock_physic,
+                                                      parent_id: values.parent_id ? values.parent_id:null
+                                                    };
 
-                                              // update product
-                                              onUpdateProduct(updateProduct);
-                                            } else {
-                                              const newProduct = {
-                                                name: values["name"],
-                                                description:
-                                                  values["description"],
-                                                livraison_id: values["livraison_id"],
-                                                categorie_id: values["categorie_id"],
-                                                stock_desire: values["stock_desire"],
-                                                stock_limit: values["stock_limit"],
-                                                stock_physic: values["stock_physic"],
-                                                parent_id: values["parent_id"] ? values["parent_id"]:null,
-                                                manager_id: this.state.name,
-                                                date_created: Date.now()
-                                              };
-                                              // save new Citie
-                                              onAddNewProduct(newProduct);
-                                            }
-                                            this.setState({
-                                              selectedProduct: null,
-                                            });
-                                            this.toggle();
-                                          }}
-                                        >
-                                          {({ errors, status, touched }) => (
-                                            <Form>
-                                              <Row>
-                                                <Col className="col-12">
-                                                  <div className="mb-3">
-                                                    <Label className="form-label">
-                                                      Name
-                                                    </Label>
-                                                    <Field
-                                                      name="name"
-                                                      type="text"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.name &&
-                                                        touched.name
-                                                          ? " is-invalid"
-                                                          : "")
-                                                      }
-                                                    />
-                                                    <ErrorMessage
-                                                      name="name"
-                                                      component="div"
-                                                      className="invalid-feedback"
-                                                    />
-                                                  </div>
-                                                  <div className="mb-3">
-                                                    <Label className="form-label">
-                                                      Livraison
-                                                    </Label>
-                                                    <Field
-                                                      name="livraison_id"
-                                                      as="select"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.categorie &&
-                                                        touched.categorie
-                                                          ? " is-invalid"
-                                                          : "")
-                                                      }
-                                                      multiple={false}
-                                                    >
-                                                      <option>---</option>
-                                                      {
-                                                        this.props.deleverys.map((delevery) => (
-                                                          <option key={delevery.id} value={delevery.id}>{delevery.numero_bordereau}</option>
-                                                        ))
-                                                      }
-                                                    </Field>
-                                                  </div>
-                                                  <div className="mb-3">
-                                                    <Label className="form-label">
-                                                      Categorie
-                                                    </Label>
-                                                    <Field
-                                                      name="categorie_id"
-                                                      as="select"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.categorie_id &&
-                                                        touched.categorie_id
-                                                          ? " is-invalid"
-                                                          : "")
-                                                      }
-                                                      multiple={false}
-                                                    >
-                                                      <option>---</option>
-                                                      {
-                                                        this.props.categories.map((categorie) => (
-                                                          <option key={categorie.id} value={categorie.id}>{categorie.name}</option>
-                                                        ))
-                                                      }
-                                                    </Field>
-                                                  </div>
-                                                  <div className="mb-3">
-                                                    <Label className="form-label">
-                                                      Parent
-                                                    </Label>
-                                                    <Field
-                                                      name="parent_id"
-                                                      as="select"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.parent_id &&
-                                                        touched.parent_id
-                                                          ? " is-invalid"
-                                                          : "")
-                                                      }
-                                                      multiple={false}
-                                                    >
-                                                      <option>---</option>
-                                                      {
-                                                        this.props.products.map((product) => (
-                                                          <option key={product.id} value={product.id}>{product.name}</option>
-                                                        ))
-                                                      }
-                                                    </Field>
-                                                  </div>
-                                                </Col>
-                                                </Row>
-                                                
-                                                <Row>
-                                                  <Col lg={4}>
-                                                    <div className="mb-3">
-                                                      <Label className="form-label">
-                                                        Quantité
-                                                      </Label>
-                                                      <Field
-                                                        name="stock_physic"
-                                                        type="number"
-                                                        className={
-                                                          "form-control" +
-                                                          (errors.stock_physic &&
-                                                          touched.stock_physic
-                                                            ? " is-invalid"
-                                                            : "")
-                                                        }
-                                                      />
-                                                      <ErrorMessage
-                                                        name="stock_physic"
-                                                        component="div"
-                                                        className="invalid-feedback"
-                                                      />
-                                                    </div>
-                                                  </Col>
-                                                  <Col lg={4}>
-                                                    <div className="mb-3">
-                                                      <Label className="form-label">
-                                                        Stock Désiré
-                                                      </Label>
-                                                      <Field
-                                                        name="stock_desire"
-                                                        type="number"
-                                                        className={
-                                                          "form-control" +
-                                                          (errors.stock_desire &&
-                                                          touched.stock_desire
-                                                            ? " is-invalid"
-                                                            : "")
-                                                        }
-                                                      />
-                                                      <ErrorMessage
-                                                        name="stock_desire"
-                                                        component="div"
-                                                        className="invalid-feedback"
-                                                      />
-                                                    </div>
-                                                  </Col>
-                                                  <Col lg={4}>
-                                                    <div className="mb-3">
-                                                      <Label className="form-label">
-                                                        Limite en Stock
-                                                      </Label>
-                                                      <Field
-                                                        name="stock_limit"
-                                                        type="number"
-                                                        className={
-                                                          "form-control" +
-                                                          (errors.stock_limit &&
-                                                          touched.stock_limit
-                                                            ? " is-invalid"
-                                                            : "")
-                                                        }
-                                                      />
-                                                      <ErrorMessage
-                                                        name="stock_limit"
-                                                        component="div"
-                                                        className="invalid-feedback"
-                                                      />
-                                                    </div>
-                                                  </Col>
-                                                </Row>
+                                                    // update product
+                                                    onUpdateProduct(updateProduct);
+                                                  } else {
+                                                    const newProduct = {
+                                                      name: values["name"],
+                                                      description:
+                                                        values["description"],
+                                                      livraison_id: values["livraison_id"],
+                                                      categorie_id: values["categorie_id"],
+                                                      stock_desire: values["stock_desire"],
+                                                      stock_limit: values["stock_limit"],
+                                                      stock_physic: values["stock_physic"],
+                                                      parent_id: values["parent_id"] ? values["parent_id"]:null,
+                                                      manager_id: this.state.name,
+                                                      date_created: Date.now()
+                                                    };
+                                                    // save new Citie
+                                                    onAddNewProduct(newProduct);
+                                                  }
+                                                  this.setState({
+                                                    selectedProduct: null,
+                                                  });
+                                                  this.toggle();
+                                                }}
+                                              >
+                                                {({ errors, status, touched }) => (
+                                                    <Form>
+                                                      <Row>
+                                                        <Col className="col-12">
+                                                          <div className="mb-3">
+                                                            <Label className="form-label">
+                                                              Name
+                                                            </Label>
+                                                            <Field
+                                                              name="name"
+                                                              type="text"
+                                                              className={
+                                                                "form-control" +
+                                                                (errors.name &&
+                                                                touched.name
+                                                                  ? " is-invalid"
+                                                                  : "")
+                                                              }
+                                                            />
+                                                            <ErrorMessage
+                                                              name="name"
+                                                              component="div"
+                                                              className="invalid-feedback"
+                                                            />
+                                                          </div>
+                                                          <div className="mb-3">
+                                                            <Label className="form-label">
+                                                              Livraison
+                                                            </Label>
+                                                            <Field
+                                                              name="livraison_id"
+                                                              as="select"
+                                                              className={
+                                                                "form-control" +
+                                                                (errors.categorie &&
+                                                                touched.categorie
+                                                                  ? " is-invalid"
+                                                                  : "")
+                                                              }
+                                                              multiple={false}
+                                                            >
+                                                              <option>---</option>
+                                                              {
+                                                                this.props.deleverys.map((delevery) => (
+                                                                  <option key={delevery.id} value={delevery.id}>{delevery.numero_bordereau}</option>
+                                                                ))
+                                                              }
+                                                            </Field>
+                                                          </div>
+                                                          <div className="mb-3">
+                                                            <Label className="form-label">
+                                                              Categorie
+                                                            </Label>
+                                                            <Field
+                                                              name="categorie_id"
+                                                              as="select"
+                                                              className={
+                                                                "form-control" +
+                                                                (errors.categorie_id &&
+                                                                touched.categorie_id
+                                                                  ? " is-invalid"
+                                                                  : "")
+                                                              }
+                                                              multiple={false}
+                                                            >
+                                                              <option>---</option>
+                                                              {
+                                                                this.props.categories.map((categorie) => (
+                                                                  <option key={categorie.id} value={categorie.id}>{categorie.name}</option>
+                                                                ))
+                                                              }
+                                                            </Field>
+                                                          </div>
+                                                          <div className="mb-3">
+                                                            <Label className="form-label">
+                                                              Parent
+                                                            </Label>
+                                                            <Field
+                                                              name="parent_id"
+                                                              as="select"
+                                                              className={
+                                                                "form-control" +
+                                                                (errors.parent_id &&
+                                                                touched.parent_id
+                                                                  ? " is-invalid"
+                                                                  : "")
+                                                              }
+                                                              multiple={false}
+                                                            >
+                                                              <option>---</option>
+                                                              {
+                                                                this.props.products.map((product) => (
+                                                                  <option key={product.id} value={product.id}>{product.name}</option>
+                                                                ))
+                                                              }
+                                                            </Field>
+                                                          </div>
+                                                        </Col>
+                                                        </Row>
+                                                        
+                                                        <Row>
+                                                          <Col lg={4}>
+                                                            <div className="mb-3">
+                                                              <Label className="form-label">
+                                                                Quantité
+                                                              </Label>
+                                                              <Field
+                                                                name="stock_physic"
+                                                                type="number"
+                                                                className={
+                                                                  "form-control" +
+                                                                  (errors.stock_physic &&
+                                                                  touched.stock_physic
+                                                                    ? " is-invalid"
+                                                                    : "")
+                                                                }
+                                                              />
+                                                              <ErrorMessage
+                                                                name="stock_physic"
+                                                                component="div"
+                                                                className="invalid-feedback"
+                                                              />
+                                                            </div>
+                                                          </Col>
+                                                          <Col lg={4}>
+                                                            <div className="mb-3">
+                                                              <Label className="form-label">
+                                                                Stock Désiré
+                                                              </Label>
+                                                              <Field
+                                                                name="stock_desire"
+                                                                type="number"
+                                                                className={
+                                                                  "form-control" +
+                                                                  (errors.stock_desire &&
+                                                                  touched.stock_desire
+                                                                    ? " is-invalid"
+                                                                    : "")
+                                                                }
+                                                              />
+                                                              <ErrorMessage
+                                                                name="stock_desire"
+                                                                component="div"
+                                                                className="invalid-feedback"
+                                                              />
+                                                            </div>
+                                                          </Col>
+                                                          <Col lg={4}>
+                                                            <div className="mb-3">
+                                                              <Label className="form-label">
+                                                                Limite en Stock
+                                                              </Label>
+                                                              <Field
+                                                                name="stock_limit"
+                                                                type="number"
+                                                                className={
+                                                                  "form-control" +
+                                                                  (errors.stock_limit &&
+                                                                  touched.stock_limit
+                                                                    ? " is-invalid"
+                                                                    : "")
+                                                                }
+                                                              />
+                                                              <ErrorMessage
+                                                                name="stock_limit"
+                                                                component="div"
+                                                                className="invalid-feedback"
+                                                              />
+                                                            </div>
+                                                          </Col>
+                                                        </Row>
 
-                                                <Row>
-                                                  <Col>
-                                                  <div className="mb-3">
-                                                    <Label className="form-label">
-                                                     Description
-                                                    </Label>
-                                                    <Field
-                                                      name="description"
-                                                      type="textarea"
-                                                      className={
-                                                        "form-control" +
-                                                        (errors.description &&
-                                                        touched.description
-                                                          ? " is-invalid"
-                                                          : "")
+                                                        <Row>
+                                                          <Col>
+                                                          <div className="mb-3">
+                                                            <Label className="form-label">
+                                                            Description
+                                                            </Label>
+                                                            <Field
+                                                              name="description"
+                                                              type="textarea"
+                                                              className={
+                                                                "form-control" +
+                                                                (errors.description &&
+                                                                touched.description
+                                                                  ? " is-invalid"
+                                                                  : "")
+                                                              }
+                                                            />
+                                                            <ErrorMessage
+                                                              name="description"
+                                                              component="div"
+                                                              className="invalid-feedback"
+                                                            />
+                                                          </div>
+                                                        </Col>
+                                                      </Row>
+                                                      <Row>
+                                                        <Col>
+                                                          <div className="text-end">
+                                                            <button
+                                                              type="submit"
+                                                              className="btn btn-success save-user"
+                                                            >
+                                                              Save
+                                                            </button>
+                                                          </div>
+                                                        </Col>
+                                                      </Row>
+                                                    </Form>
+                                                )}
+                                              </Formik>
+                                            </TabPane>
+
+                                            <TabPane tabId="2">
+                                              <Formik
+                                                enableReinitialize={true}
+                                                initialValues={{
+                                                  name: (product && product.name) || "",
+                                                  description:
+                                                    (product && product.description) || "",
+                                                  stock_physic: (product && product.stock_physic) || "",
+                                                  stock_limit: (product && product.stock_limit) || "",
+                                                  stock_desire: (product && product.stock_desire) || "",
+                                                  parent_id: (product && product.parent ? product.parent.id:0) || ""
+                                                }}
+                                                validationSchema={Yup.object().shape({
+                                                  description: Yup.string().required(
+                                                    this.props.t("Please Enter Description")
+                                                  ),
+                                                })}
+                                                onSubmit={values => {
+                                                  if (isEdit) {
+                                                    for(let i=0;i<products.length;i++){
+                                                      if(products[i].id==values["product"]){
+                                                         const updateProduct = {
+                                                          id: product.id,
+                                                          name: products[i].name,
+                                                          description:
+                                                            values["description"],
+                                                          livraison_id: products[i].livraison.id,
+                                                          categorie_id: products[i].categorie.id,
+                                                          stock_desire: products[i].stock_desire,
+                                                          stock_limit: products[i].stock_limit,
+                                                          stock_physic: values.stock_physic,
+                                                          parent_id: products[i].parent ? products[i].parent.id:null,
+                                                          // manager_id: products[i].manager ? products[i].manager.id: null,
+                                                          // date_created: Date.now()
+                                                        };
+                                                        // update product
+                                                        onUpdateProduct(updateProduct);
                                                       }
-                                                    />
-                                                    <ErrorMessage
-                                                      name="description"
-                                                      component="div"
-                                                      className="invalid-feedback"
-                                                    />
-                                                  </div>
-                                                </Col>
-                                              </Row>
-                                              <Row>
-                                                <Col>
-                                                  <div className="text-end">
-                                                    <button
-                                                      type="submit"
-                                                      className="btn btn-success save-user"
-                                                    >
-                                                      Save
-                                                    </button>
-                                                  </div>
-                                                </Col>
-                                              </Row>
-                                            </Form>
-                                          )}
-                                        </Formik>
+                                                    }
+                                                    // const updateProduct = {
+                                                    //   id: product.id,
+                                                    //   name: values.name,
+                                                    //   description: values.description,
+                                                    //   livraison_id: values.livraison_id,
+                                                    //   categorie_id: values.categorie_id,
+                                                    //   stock_desire: values.stock_desire,
+                                                    //   stock_limit: values.stock_limit,
+                                                    //   stock_physic: values.stock_physic,
+                                                    //   parent_id: values.parent_id ? values.parent_id:null
+                                                    // };
+
+                                                    // update product
+                                                  } else {
+                                                    for(let i=0;i<products.length;i++){
+                                                      if(products[i].id==values['product']){
+                                                         const newProduct = {
+                                                          name: products[i].name,
+                                                          description:
+                                                            values["description"],
+                                                          livraison_id: products[i].livraison.id,
+                                                          categorie_id: products[i].categorie.id,
+                                                          stock_desire: products[i].stock_desire,
+                                                          stock_limit: products[i].stock_limit,
+                                                          stock_physic: values["stock_physic"],
+                                                          parent_id: products[i].parent ? products[i].parent.id:null,
+                                                          manager_id: products[i].manager ? products[i].manager.id: null,
+                                                          date_created: Date.now()
+                                                        };
+                                                        
+                                                        onAddNewProduct(newProduct);
+                                                      }
+                                                    }
+                                                  }
+                                                  this.setState({
+                                                    selectedProduct: null,
+                                                  });
+                                                  this.toggle();
+                                                }}
+                                              >
+                                                {({ errors, status, touched }) => (
+                                                    <Form>
+                                                      <Row>
+                                                        <Col className="col-12">
+                                                          <div className="mb-3">
+                                                            <Label className="form-label">
+                                                              Materiel
+                                                            </Label>
+                                                            <Field
+                                                              name="product"
+                                                              as="select"
+                                                              className={
+                                                                "form-control" +
+                                                                (errors.product &&
+                                                                touched.product
+                                                                  ? " is-invalid"
+                                                                  : "")
+                                                              }
+                                                              multiple={false}
+                                                            >
+                                                              <option>---</option>
+                                                              {
+                                                                this.props.products.map((product) => (
+                                                                  <option key={product.id} value={product.id}>{product.name}</option>
+                                                                ))
+                                                              }
+                                                            </Field>
+                                                          </div>
+                                                        </Col>
+                                                        </Row>
+                                                        
+                                                        <Row>
+                                                          <Col lg={12}>
+                                                            <div className="mb-3">
+                                                              <Label className="form-label">
+                                                                Quantité
+                                                              </Label>
+                                                              <Field
+                                                                name="stock_physic"
+                                                                type="number"
+                                                                className={
+                                                                  "form-control" +
+                                                                  (errors.stock_physic &&
+                                                                  touched.stock_physic
+                                                                    ? " is-invalid"
+                                                                    : "")
+                                                                }
+                                                              />
+                                                              <ErrorMessage
+                                                                name="stock_physic"
+                                                                component="div"
+                                                                className="invalid-feedback"
+                                                              />
+                                                            </div>
+                                                          </Col>
+                                                        </Row>
+
+                                                        <Row>
+                                                          <Col>
+                                                          <div className="mb-3">
+                                                            <Label className="form-label">
+                                                            Description
+                                                            </Label>
+                                                            <Field
+                                                              name="description"
+                                                              type="textarea"
+                                                              className={
+                                                                "form-control" +
+                                                                (errors.description &&
+                                                                touched.description
+                                                                  ? " is-invalid"
+                                                                  : "")
+                                                              }
+                                                            />
+                                                            <ErrorMessage
+                                                              name="description"
+                                                              component="div"
+                                                              className="invalid-feedback"
+                                                            />
+                                                          </div>
+                                                        </Col>
+                                                      </Row>
+                                                      <Row>
+                                                        <Col>
+                                                          <div className="text-end">
+                                                            <button
+                                                              type="submit"
+                                                              className="btn btn-success save-user"
+                                                            >
+                                                              Save
+                                                            </button>
+                                                          </div>
+                                                        </Col>
+                                                      </Row>
+                                                    </Form>
+                                                )}
+                                              </Formik>
+                                            </TabPane>
+                                          </TabContent>
+                                        </>
                                       </ModalBody>
                                     </Modal>
                                   </div>

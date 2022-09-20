@@ -51,11 +51,13 @@ class FormUpload extends Component {
     const formData = new FormData()
     console.log(this.state.selectedFiles)
     this.props.closeModal()
+    let file=""
     for(let i=0;i<this.state.selectedFiles.length;i++){
-        formData.append("document", this.state.selectedFiles[0])
+        formData.append("document", this.state.selectedFiles[i])
+        file = file ? file+";"+this.state.selectedFiles[i].name: this.state.selectedFiles[i].name
         await axios({
             method: "put",
-            url:process.env.REACT_APP_URL+"stock/"+this.props.id+"/add_document?filename="+this.state.selectedFiles[i].name,
+            url:process.env.REACT_APP_URL+"stock/"+this.props.id+"/add_document?filename="+file,
             data: formData,
             headers: {
               'Content-Type': 'multipart/form-data'

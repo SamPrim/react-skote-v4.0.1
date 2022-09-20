@@ -54,14 +54,22 @@ import {
 } from "store/delevery/actions";
 
 import { isEmpty, size, map } from "lodash";
+import UiLightbox from "./ui/LightBox"
 
 class DeliverysList extends Component {
   constructor(props) {
     super(props);
     this.node = React.createRef();
+    this.onClickLightBox = this.onClickLightBox.bind(this)
+    this.onMovePrevRequest = this.onMovePrevRequest.bind(this)
+    this.onMoveNextRequest = this.onMoveNextRequest.bind(this)
+    this.onCloseRequest = this.onCloseRequest.bind(this)
     this.state = {
       deleverys: [],
       delevery: "",
+      images: [],
+      isGallery: false,
+      photoIndex: 0,
       modal: false,
       isFits: false,
       deleteModal: false,
@@ -134,16 +142,11 @@ class DeliverysList extends Component {
                   onClick={() => this.onClickDelete(delevery)}
                 ></i>
               </Link>
-              <a className="text-success" 
-                href={process.env.REACT_APP_STATIC_URL+"livraisons/"+delevery.numero_bordereau+"-"+delevery.fournisseur+".png"}
-                target="_blank"
-                rel="noreferrer"
-               >
                 <i
                   className="mdi mdi-file-eye font-size-18"
                   id="deletetooltip"
+                  onClick={() => this.onClickLightBox(delevery.document.split(";"), 0)}
                 ></i>
-              </a>
             </div>
           ),
         },
@@ -151,6 +154,7 @@ class DeliverysList extends Component {
     };
     this.handleDeleveryClick = this.handleDeleveryClick.bind(this);
     this.toggle = this.toggle.bind(this);
+    this.onClickLightBox = this.onClickLightBox.bind(this);
     this.handleDeleveryClicks = this.handleDeleveryClicks.bind(this);
     this.onClickDelete = this.onClickDelete.bind(this);
   }
@@ -170,6 +174,23 @@ class DeliverysList extends Component {
     this.setState(prevState => ({
       modal: !prevState.modal,
     }));
+  }
+
+  onClickLightBox(images, id){
+    this.setState({ images: images })
+    this.setState({ isGallery: true, photoIndex: id })
+  }
+  onCloseRequest(){this.setState({ isGallery: false })}
+  onMovePrevRequest(index){
+    this.setState({
+      photoIndex:
+        (index + this.state.images.length - 1) % this.state.images.length,
+    })
+  }
+  onMoveNextRequest(index){
+    this.setState({
+      photoIndex: (index + 1) % this.state.images.length,
+    })
   }
 
   handleDeleveryClicks = () => {
@@ -272,6 +293,14 @@ class DeliverysList extends Component {
           show={deleteModal}
           onDeleteClick={this.handleDeleteDelevery}
           onCloseClick={() => this.setState({ deleteModal: false })}
+        />
+        <UiLightbox 
+          images={this.state.images} 
+          isGallery={this.state.isGallery}
+          photoIndex={this.state.photoIndex}
+          onMovePrevRequest={this.onMovePrevRequest}
+          onCloseRequest={this.onCloseRequest}
+          onMoveNextRequest={this.onMoveNextRequest}
         />
         <div className="page-content">
           <Container fluid>

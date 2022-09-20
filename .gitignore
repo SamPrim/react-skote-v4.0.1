@@ -27,5 +27,3 @@ yarn-error.log*
 package-lock.json
 .eslintcache
 debug.log
-
-/uploads
