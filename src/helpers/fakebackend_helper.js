@@ -73,6 +73,16 @@ export const updateLocal = (local, id) => put(API_URL+"/entrepot/"+id+"/entrepot
 // delete local
 export const deleteLocal = (local, id) => del(API_URL+"/entrepot/"+id+"/entrepot", {headers: { local }}) // add this route to delete local
 
+////////////
+// get location
+export const getLocations = () => get("/stock/location") // add this route to get all locations
+// add location
+export const addNewLocation = (location) => post(API_URL+"/stock/location", location) // add this route to add location
+// put location
+export const updateLocation = (location, id) => put(API_URL+"/stock/"+id+"/location", location) // add this route to update location
+// delete location
+export const deleteLocation = (location, id) => del(API_URL+"/stock/"+id+"/location", {headers: { location }}) // add this route to delete location
+
 ///////////////
 // get natures
 export const getNatures = () => get("/stock/natures") // add this route to get all natures
@@ -112,6 +122,19 @@ export const addNewProduct = (product) => post(API_URL+"/stock/produit", product
 export const updateProduct = (product, id) => put(API_URL+"/stock/"+id+"/produit", product) // add this route to update product
 // delete product
 export const deleteProduct = (product, id) => del(API_URL+"/stock/"+id+"/produit", {headers: { product }}) // add this route to delete product
+// inventaire
+export const getInventory = (search, categorie_id,start, end ) => get("/stock/inventaire?&categorie_id="+categorie_id)
+
+/////////////////
+// get transfers
+export const getTransferts = (user) => get("/stock/transfer?user_id="+user.user_id) // add this route to get all transfers
+// add transfer
+export const addNewTransfert = (transfer) => post(API_URL+"/stock/transfer", transfer) // add this route to add transfer
+// put transfer
+export const updateTransfert = (transfer, id) => put(API_URL+"/stock/"+id+"/transfer", transfer) // add this route to update transfer
+// delete transfer
+export const deleteTransfert = (transfer, id) => del(API_URL+"/stock/"+id+"/transfer", {headers: { transfer }}) // add this route to delete transfer
+
 
 //////////////////////////////////////////////////////////////
 

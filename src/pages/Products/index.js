@@ -810,7 +810,7 @@ class ProductsList extends Component {
                                                           name: products[i].name,
                                                           description:
                                                             values["description"],
-                                                          livraison_id: products[i].livraison.id,
+                                                          livraison_id: values["livraison_id"],
                                                           categorie_id: products[i].categorie.id,
                                                           stock_desire: products[i].stock_desire,
                                                           stock_limit: products[i].stock_limit,
@@ -843,7 +843,7 @@ class ProductsList extends Component {
                                                           name: products[i].name,
                                                           description:
                                                             values["description"],
-                                                          livraison_id: products[i].livraison.id,
+                                                          livraison_id: values["livraison_id"],
                                                           categorie_id: products[i].categorie.id,
                                                           stock_desire: products[i].stock_desire,
                                                           stock_limit: products[i].stock_limit,
@@ -887,6 +887,30 @@ class ProductsList extends Component {
                                                               {
                                                                 this.props.products.map((product) => (
                                                                   <option key={product.id} value={product.id}>{product.name}</option>
+                                                                ))
+                                                              }
+                                                            </Field>
+                                                          </div>
+                                                          <div className="mb-3">
+                                                            <Label className="form-label">
+                                                              Livraison
+                                                            </Label>
+                                                            <Field
+                                                              name="livraison_id"
+                                                              as="select"
+                                                              className={
+                                                                "form-control" +
+                                                                (errors.categorie &&
+                                                                touched.categorie
+                                                                  ? " is-invalid"
+                                                                  : "")
+                                                              }
+                                                              multiple={false}
+                                                            >
+                                                              <option>---</option>
+                                                              {
+                                                                this.props.deleverys.map((delevery) => (
+                                                                  <option key={delevery.id} value={delevery.id}>{delevery.numero_bordereau}</option>
                                                                 ))
                                                               }
                                                             </Field>

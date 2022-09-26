@@ -23,6 +23,9 @@ import Locals from "pages/Locals"
 import Natures from "pages/Natures"
 import Categories from "pages/Categories"
 import Delivery from "pages/Delivery"
+import Inventory from "pages/inventory"
+import Transfer from "pages/Transfer"
+import Locations from "pages/Locations"
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: Dashboard },
@@ -59,6 +62,15 @@ const authProtectedRoutes = [
 
   // Livraison
   { path: "/delivery", component: Delivery },
+
+  // Invetaire
+  { path: "/inventory", component: Inventory },
+
+  // Transfer
+  { path: "/new-transfer", component: Transfer },
+
+  // Locations
+  { path: "/locations", component: Locations },
 
   // this route should be at the end of all other routes
   // eslint-disable-next-line react/display-name

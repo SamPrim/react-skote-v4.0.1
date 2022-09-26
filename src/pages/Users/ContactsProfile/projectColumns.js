@@ -5,23 +5,23 @@ const projectColumns = () => [
     sort: true,
   },
   {
-    dataField: "fullname",
+    dataField: "produit.name",
     text: "Name",
     sort: true,
   },
   {
-    dataField: "email",
-    text: "Email",
+    dataField: "date_created",
+    text: "Date",
     sort: true,
   },
   {
-    dataField: "groups.name",
-    text: "Group",
+    dataField: "location.name",
+    text: "Emplacement",
     sort: true,
   },
   {
-    dataField: "is_active",
-    text: "Status",
+    dataField: "serial_number",
+    text: "Serial Number",
     sort: true,
   },
 ]

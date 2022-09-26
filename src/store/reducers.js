@@ -61,8 +61,16 @@ import Categories from "./categories/reducer";
 import Deleverys from "./delevery/reducer"
 
 // Products
-
 import Products from "./products/reducer"
+
+// Inventory
+import Inventory from "./inventory/reducer"
+
+// Locations
+import Locations from "./location/reducer"
+
+// Transferts
+import Transferts from "./transfert/reducer"
 
 const rootReducer = combineReducers({
   // public
@@ -89,6 +97,9 @@ const rootReducer = combineReducers({
   Categories, // add
   Deleverys, // add
   Products, // add
+  Inventory, // add
+  Locations, // add
+  Transferts, //add
 })
 
 export default rootReducer

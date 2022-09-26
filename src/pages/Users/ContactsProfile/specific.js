@@ -19,6 +19,9 @@ import {
     deleteUser,
     getUserProfile,
 } from "store/contacts/actions";
+import {
+  getTransferts,
+} from "store/transfert/actions";
 import profile1 from "assets/images/profile-img.png";
 import avatar from "assets/images/users/avatar-6.jpg";
 // import charts
@@ -53,8 +56,9 @@ class User extends Component {
         };
     };
     componentDidMount() {
-        const { onGetUserData } = this.props;
+        const { onGetUserData, onGetTransferts } = this.props;
         onGetUserData(this.state.id.id);
+        onGetTransferts({"user_id": this.state.id.id})
     };
     //get Data
     componentDidUpdate(prevProps) {
@@ -126,7 +130,7 @@ class User extends Component {
                                 {user.fullname}
                               </h5>
                               <p className="text-muted mb-0 text-truncate">
-                                Dev
+                                Dev 
                               </p>
                             </Col>
       
@@ -217,7 +221,7 @@ class User extends Component {
                           <CardTitle className="mb-4 h4">{this.props.t("Transfer")}</CardTitle>
                           <ToolkitProvider
                             keyField="id"
-                            data={[user] || []}
+                            data={this.props.transferts || []}
                             columns={projectColumns()}
                             bootstrap4
                           >
@@ -255,20 +259,24 @@ class User extends Component {
 }
 
 User.propTypes = {
-    getUserProfile: PropTypes.func,
-    error: PropTypes.any,
-    success: PropTypes.any,
-    resetProfileFlag: PropTypes.func,
-    t: PropTypes.any,
+  transferts: PropTypes.array,
+  getUserProfile: PropTypes.func,
+  error: PropTypes.any,
+  success: PropTypes.any,
+  resetProfileFlag: PropTypes.func,
+  onGetTransferts: PropTypes.func,
+  t: PropTypes.any,
   };
   
-const mapStateToProps = ({ contacts }) => ({
-    UserProfile: contacts.userProfile,
-    error : contacts.error
+const mapStateToProps = ({ contacts, Transferts }) => ({
+  UserProfile: contacts.userProfile,
+  error : contacts.error,
+  transferts: Transferts.transferts,
 });
 
 const mapDispatchToProps = dispatch => ({
-    onGetUserData: id => dispatch(getUserProfile(id)),
+  onGetUserData: id => dispatch(getUserProfile(id)),
+  onGetTransferts: user => dispatch(getTransferts(user)),
   });
   
 export default connect(

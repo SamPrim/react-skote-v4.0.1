@@ -70,7 +70,7 @@ class UiLightbox extends Component {
                 prevSrc={
                   images[(photoIndex + images.length - 1) % images.length]
                 }
-                enableZoom={false}
+                enableZoom={true}
                 onCloseRequest={() => this.props.onCloseRequest(false)}
                 onMovePrevRequest={() => this.props.onMovePrevRequest(photoIndex + images.length - 1) % images.length
                 }

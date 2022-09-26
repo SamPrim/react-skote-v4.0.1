@@ -24,6 +24,9 @@ import naturesSaga from "./natures/saga"
 import categoriesSaga from "./categories/saga"
 import deleverysSaga from "./delevery/saga"
 import productsSaga from "./products/saga"
+import inventorysSaga from "./inventory/saga"
+import locationsSaga from "./location/saga"
+import transfertsSaga from "./transfert/saga"
 
 export default function* rootSaga() {
   yield all([
@@ -50,6 +53,9 @@ export default function* rootSaga() {
     fork(naturesSaga),
     fork(categoriesSaga),
     fork(deleverysSaga),
-    fork(productsSaga)
+    fork(productsSaga),
+    fork(inventorysSaga), 
+    fork(locationsSaga),
+    fork(transfertsSaga),
   ])
 }
